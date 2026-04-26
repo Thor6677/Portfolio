@@ -1,0 +1,52 @@
+---
+import Base from '../layouts/Base.astro';
+---
+<Base title="About">
+  <h1>About</h1>
+
+  <p class="bio">
+    Software developer with a focus on building tools that make complex systems
+    legible. I primarily work on EVE Online infrastructure and enjoy the
+    challenge of turning dense game data into useful interfaces.
+  </p>
+
+  <div class="links">
+    <a
+      href="https://github.com/Thor6677"
+      target="_blank"
+      rel="noopener"
+      class="link-btn"
+    >GitHub ↗</a>
+    <a
+      href="https://vigilant.thunderborn.dev"
+      target="_blank"
+      rel="noopener"
+      class="link-btn"
+    >Vigilant ↗</a>
+  </div>
+</Base>
+
+<style>
+  h1 { font-size: 1.25rem; font-weight: 600; margin: 0 0 1.25rem; }
+
+  .bio {
+    font-size: 0.875rem;
+    line-height: 1.8;
+    color: var(--text-secondary);
+    max-width: 560px;
+    margin: 0 0 1.5rem;
+  }
+
+  .links { display: flex; gap: 0.5rem; flex-wrap: wrap; }
+
+  .link-btn {
+    font-size: 0.8rem;
+    color: var(--text-muted);
+    border: 1px solid var(--border);
+    border-radius: 3px;
+    padding: 0.3rem 0.75rem;
+    transition: color 0.15s;
+  }
+
+  .link-btn:hover { color: var(--text-secondary); }
+</style>
