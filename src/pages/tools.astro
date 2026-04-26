@@ -1,0 +1,79 @@
+---
+import Base from '../layouts/Base.astro';
+---
+<Base title="Tools">
+  <h1>Tools</h1>
+  <p class="subtitle">Things I've built and shipped</p>
+
+  <div class="tool-card">
+    <div class="tool-header">
+      <span class="tool-name">Vigilant</span>
+      <a
+        href="https://vigilant.thunderborn.dev"
+        target="_blank"
+        rel="noopener"
+        class="live-link"
+      >Live ↗</a>
+    </div>
+    <p class="tool-desc">
+      EVE Online companion dashboard — multi-character overview, interactive
+      star map, ship fitting tool, intel, and more.
+    </p>
+    <div class="tool-tags">
+      <span class="tag">Python</span>
+      <span class="tag">React</span>
+      <span class="tag">EVE ESI</span>
+    </div>
+  </div>
+</Base>
+
+<style>
+  h1 { font-size: 1.25rem; font-weight: 600; margin: 0 0 0.25rem; }
+
+  .subtitle { color: var(--text-muted); font-size: 0.85rem; margin: 0 0 1.5rem; }
+
+  .tool-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 1.25rem;
+  }
+
+  .tool-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0.75rem;
+  }
+
+  .tool-name { font-weight: 600; font-size: 0.95rem; }
+
+  .live-link {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    border: 1px solid var(--border);
+    border-radius: 3px;
+    padding: 0.2rem 0.5rem;
+    transition: color 0.15s;
+  }
+
+  .live-link:hover { color: var(--text-secondary); }
+
+  .tool-desc {
+    font-size: 0.8rem;
+    color: var(--text-secondary);
+    line-height: 1.6;
+    margin: 0 0 0.75rem;
+  }
+
+  .tool-tags { display: flex; gap: 0.4rem; flex-wrap: wrap; }
+
+  .tag {
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 3px;
+    padding: 0.15rem 0.4rem;
+    font-size: 0.7rem;
+    color: var(--text-muted);
+  }
+</style>
