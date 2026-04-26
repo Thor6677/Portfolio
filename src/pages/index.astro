@@ -2,5 +2,95 @@
 import Base from '../layouts/Base.astro';
 ---
 <Base title="Home">
-  <h1>thunderborn.dev</h1>
+  <section class="hero">
+    <h1>Iian Johnson</h1>
+    <p class="tagline">Software developer · EVE Online toolmaker</p>
+    <p class="bio">
+      I build software tools that make complex systems legible —
+      mostly EVE Online infrastructure, occasionally other things.
+    </p>
+  </section>
+
+  <nav class="hub-cards">
+    <a href="/tools" class="hub-card">
+      <span class="hub-icon">🛠</span>
+      <h2>Tools</h2>
+      <p>Public projects and utilities I've shipped</p>
+    </a>
+    <a href="/blog" class="hub-card">
+      <span class="hub-icon">📝</span>
+      <h2>Blog</h2>
+      <p>Dev writeups and notes on what I'm building</p>
+    </a>
+    <a href="/about" class="hub-card">
+      <span class="hub-icon">👤</span>
+      <h2>About</h2>
+      <p>Background, interests, and how to reach me</p>
+    </a>
+  </nav>
 </Base>
+
+<style>
+  .hero {
+    padding-bottom: 2rem;
+    border-bottom: 1px solid var(--border);
+    margin-bottom: 2rem;
+  }
+
+  h1 {
+    font-size: 1.5rem;
+    font-weight: 600;
+    margin: 0 0 0.25rem;
+  }
+
+  .tagline {
+    color: var(--text-muted);
+    font-size: 0.85rem;
+    margin: 0 0 1rem;
+  }
+
+  .bio {
+    color: var(--text-secondary);
+    font-size: 0.875rem;
+    line-height: 1.7;
+    max-width: 480px;
+    margin: 0;
+  }
+
+  .hub-cards {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 0.75rem;
+  }
+
+  .hub-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 1.25rem;
+    display: block;
+    transition: border-color 0.15s;
+  }
+
+  .hub-card:hover { border-color: var(--text-muted); }
+
+  .hub-icon { font-size: 1.25rem; }
+
+  .hub-card h2 {
+    font-size: 0.875rem;
+    font-weight: 600;
+    margin: 0.5rem 0 0.25rem;
+    color: var(--text);
+  }
+
+  .hub-card p {
+    font-size: 0.8rem;
+    color: var(--text-muted);
+    line-height: 1.5;
+    margin: 0;
+  }
+
+  @media (max-width: 600px) {
+    .hub-cards { grid-template-columns: 1fr; }
+  }
+</style>
