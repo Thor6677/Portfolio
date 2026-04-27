@@ -30,6 +30,7 @@ const tools = listTools();
             data-url={tool.url}
             data-description={tool.description}
             data-tags={JSON.parse(tool.tags).join(', ')}
+            data-tags-json={tool.tags}
             data-display-order={tool.display_order}
             data-active={tool.active}
           >
@@ -273,7 +274,20 @@ const tools = listTools();
     });
   });
 
-  // Reorder ↑/↓ — must send full tool data so PUT doesn't lose other fields
+  // Reorder ↑/↓ — swap display_order with sibling row to avoid duplicates
+  function buildPutData(row: HTMLTableRowElement, order: number): FormData {
+    const d = new FormData();
+    d.set('name', row.dataset.name ?? '');
+    d.set('url', row.dataset.url ?? '');
+    d.set('description', row.dataset.description ?? '');
+    // Use raw JSON to avoid comma-splitting on tags that contain commas
+    const tagsArr: string[] = JSON.parse(row.dataset.tagsJson ?? '[]');
+    d.set('tags', tagsArr.join(','));
+    d.set('display_order', String(order));
+    d.set('active', row.dataset.active ?? '0');
+    return d;
+  }
+
   document.querySelectorAll<HTMLButtonElement>('.order-btn').forEach(btn => {
     btn.addEventListener('click', async () => {
       const id = btn.dataset.id!;
@@ -281,18 +295,21 @@ const tools = listTools();
       const row = getRow(id);
       if (!row) return;
       const currentOrder = parseInt(row.dataset.displayOrder ?? '0', 10);
-      const newOrder = dir === 'up' ? currentOrder - 1 : currentOrder + 1;
 
-      const data = new FormData();
-      data.set('name', row.dataset.name ?? '');
-      data.set('url', row.dataset.url ?? '');
-      data.set('description', row.dataset.description ?? '');
-      data.set('tags', row.dataset.tags ?? '');
-      data.set('display_order', String(newOrder));
-      data.set('active', row.dataset.active ?? '0');
+      // Find sibling data row (skip edit-rows)
+      const allRows = Array.from(document.querySelectorAll<HTMLTableRowElement>('tr[id^="row-"]'));
+      const currentIdx = allRows.indexOf(row);
+      const siblingRow = dir === 'up' ? allRows[currentIdx - 1] : allRows[currentIdx + 1];
+      if (!siblingRow) return;
 
-      const res = await fetch(`/api/tools/${id}`, { method: 'PUT', body: data });
-      if (res.ok) {
+      const siblingOrder = parseInt(siblingRow.dataset.displayOrder ?? '0', 10);
+      const siblingId = siblingRow.dataset.id!;
+
+      const [res1, res2] = await Promise.all([
+        fetch(`/api/tools/${id}`, { method: 'PUT', body: buildPutData(row, siblingOrder) }),
+        fetch(`/api/tools/${siblingId}`, { method: 'PUT', body: buildPutData(siblingRow, currentOrder) }),
+      ]);
+      if (res1.ok && res2.ok) {
         window.location.reload();
       } else {
         alert('Reorder failed');

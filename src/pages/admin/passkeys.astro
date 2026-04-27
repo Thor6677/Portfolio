@@ -104,15 +104,16 @@ const passkeys = listPasskeys();
   const errEl = document.getElementById('add-error') as HTMLElement;
 
   addBtn.addEventListener('click', async () => {
+    const name = prompt('Name this passkey (e.g. "MacBook Touch ID"):')?.trim() || 'Passkey';
     addBtn.disabled = true;
     errEl.hidden = true;
     try {
       const { challengeToken, options } = await fetch('/api/auth/register-challenge').then(r => r.json());
-      const credential = await startRegistration({ optionsJSON: options });
+      const response = await startRegistration({ optionsJSON: options });
       const res = await fetch('/api/auth/verify-registration', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ challengeToken, credential }),
+        body: JSON.stringify({ challengeToken, response, name }),
       });
       if (res.ok) {
         window.location.reload();
