@@ -1,0 +1,10 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npm run:*)",
+      "Bash(npm install:*)",
+      "Bash(./deploy.sh)",
+      "Bash(./node_modules/.bin/tsc:*)"
+    ]
+  }
+}

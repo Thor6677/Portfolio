@@ -20,9 +20,7 @@ const { title } = Astro.props;
           <a href="/admin/posts/new">New Post</a>
           <a href="/admin/tools">Tools</a>
           <a href="/admin/passkeys">Passkeys</a>
-          <form method="POST" action="/api/auth/logout" style="display:inline">
-            <button type="submit" class="signout-btn">Sign out</button>
-          </form>
+          <button type="button" class="signout-btn" id="signout-btn">Sign out</button>
         </div>
       </nav>
       <main class="admin-main">
@@ -31,6 +29,13 @@ const { title } = Astro.props;
     </div>
   </body>
 </html>
+
+<script>
+  document.getElementById('signout-btn')?.addEventListener('click', async () => {
+    await fetch('/api/auth/logout', { method: 'POST' });
+    window.location.href = '/admin/login';
+  });
+</script>
 
 <style>
   .admin-shell { display: flex; flex-direction: column; min-height: 100vh; }
