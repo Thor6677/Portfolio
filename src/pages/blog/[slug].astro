@@ -1,6 +1,7 @@
 ---
 import Base from '../../layouts/Base.astro';
 import { getPostBySlug } from '../../lib/db';
+import sanitizeHtml from 'sanitize-html';
 
 const { slug } = Astro.params;
 const post = getPostBySlug(slug!);
@@ -12,12 +13,23 @@ if (!post || post.published !== 1) {
 const dateStr = new Date(post.created_at * 1000).toLocaleDateString('en-US', {
   year: 'numeric', month: 'long', day: 'numeric'
 });
+
+const safeHtml = sanitizeHtml(post.content_html, {
+  allowedTags: ['p', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'strong', 'em',
+                'code', 'pre', 'blockquote', 'ul', 'ol', 'li', 'br', 'hr', 'a'],
+  allowedAttributes: {
+    a: ['href', 'target', 'rel'],
+    code: ['class'],
+    pre: ['class'],
+  },
+  allowedSchemes: ['http', 'https', 'mailto'],
+});
 ---
 <Base title={post.title}>
   <article>
     <h1>{post.title}</h1>
     <time class="date">{dateStr}</time>
-    <div class="content" set:html={post.content_html}></div>
+    <div class="content" set:html={safeHtml}></div>
   </article>
 </Base>
 

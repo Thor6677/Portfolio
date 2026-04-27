@@ -1,6 +1,15 @@
 import type { APIRoute } from 'astro';
 import { getToolById, updateTool, deleteTool } from '../../../lib/db';
 
+function isValidToolUrl(url: string): boolean {
+  try {
+    const parsed = new URL(url);
+    return parsed.protocol === 'http:' || parsed.protocol === 'https:';
+  } catch {
+    return false;
+  }
+}
+
 export const PUT: APIRoute = async ({ params, request }) => {
   const id = parseInt(params.id ?? '');
   if (!id || !getToolById(id)) {
@@ -21,6 +30,12 @@ export const PUT: APIRoute = async ({ params, request }) => {
 
   if (!name || !url) {
     return new Response(JSON.stringify({ error: 'Name and URL are required' }), {
+      status: 400,
+      headers: { 'Content-Type': 'application/json' },
+    });
+  }
+  if (!isValidToolUrl(url)) {
+    return new Response(JSON.stringify({ error: 'URL must use http or https' }), {
       status: 400,
       headers: { 'Content-Type': 'application/json' },
     });

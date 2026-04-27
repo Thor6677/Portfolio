@@ -8,9 +8,7 @@ export const onRequest = defineMiddleware(async (context, next) => {
     setupTokenLogged = true;
     if (countPasskeys() === 0) {
       const token = getOrCreateSetupToken();
-      console.log(`[portfolio] No passkeys registered.`);
-      console.log(`[portfolio] Setup token: ${token}`);
-      console.log(`[portfolio] Visit https://thunderborn.dev/admin/setup?token=${token}`);
+      console.log(`[portfolio] No passkeys registered. Setup token (expires in 30 min): ${token}`);
     }
   }
 

@@ -1,7 +1,7 @@
 import type { APIRoute } from 'astro';
 import { deleteSession } from '../../../lib/db';
 
-export const GET: APIRoute = async ({ cookies }) => {
+export const POST: APIRoute = async ({ cookies }) => {
   const sessionId = cookies.get('session')?.value;
   if (sessionId) {
     deleteSession(sessionId);

@@ -268,18 +268,25 @@ export function consumeChallenge(token: string): string | null {
 
 // ── Setup tokens (first-time passkey registration) ────────────────────────────
 
+const SETUP_TOKEN_TTL = 30 * 60; // 30 minutes
+
 export function getOrCreateSetupToken(): string {
   const db = getDb();
+  const now = Math.floor(Date.now() / 1000);
+  db.prepare('UPDATE setup_tokens SET used = 1 WHERE created_at < ?').run(now - SETUP_TOKEN_TTL);
   const existing = db.prepare('SELECT token FROM setup_tokens WHERE used = 0').get() as { token: string } | undefined;
   if (existing) return existing.token;
   const token = randomBytes(32).toString('hex');
-  db.prepare('INSERT INTO setup_tokens (token, used, created_at) VALUES (?, 0, ?)').run(token, Math.floor(Date.now() / 1000));
+  db.prepare('INSERT INTO setup_tokens (token, used, created_at) VALUES (?, 0, ?)').run(token, now);
   return token;
 }
 
 export function isSetupTokenValid(token: string): boolean {
   if (countPasskeys() > 0) return false;
-  return !!getDb().prepare('SELECT token FROM setup_tokens WHERE token = ? AND used = 0').get(token);
+  const now = Math.floor(Date.now() / 1000);
+  return !!getDb().prepare(
+    'SELECT token FROM setup_tokens WHERE token = ? AND used = 0 AND created_at >= ?'
+  ).get(token, now - SETUP_TOKEN_TTL);
 }
 
 export function consumeSetupToken(token: string): boolean {

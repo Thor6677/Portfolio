@@ -108,7 +108,7 @@ import AdminBase from '../../../layouts/AdminBase.astro';
 
   const editor = new Editor({
     element: document.getElementById('editor-mount')!,
-    extensions: [StarterKit, Link.configure({ openOnClick: false })],
+    extensions: [StarterKit, Link.configure({ openOnClick: false, validate: href => /^https?:\/\//i.test(href) })],
     onUpdate({ editor }) {
       (document.getElementById('content-hidden') as HTMLInputElement).value = editor.getHTML();
       updateToolbar(editor);
