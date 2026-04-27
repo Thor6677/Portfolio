@@ -59,7 +59,7 @@
     {
       "id": 16,
       "subject": "Task 8: Tools and passkeys admin pages",
-      "status": "pending",
+      "status": "completed",
       "blockedBy": [14],
       "description": "**Goal:** Build `/admin/tools.astro` (tool CRUD with edit forms inline) and `/admin/passkeys.astro` (list passkeys, delete, add new).\n\n**Files:**\n- Create: `src/pages/admin/tools.astro`\n- Create: `src/pages/admin/passkeys.astro`\n\n**Acceptance Criteria:**\n- [ ] Tools page lists all tools with edit form togglable per row\n- [ ] Edits submit via fetch PUT to `/api/tools/[id]`\n- [ ] Delete calls `DELETE /api/tools/[id]` and removes row from DOM\n- [ ] Display order ↑/↓ buttons work\n- [ ] Add tool form submits via fetch POST to `/api/tools`\n- [ ] Passkeys page lists registered credentials with name and date\n- [ ] Delete passkey calls `DELETE /api/passkeys/[id]`\n- [ ] \"Add another passkey\" runs WebAuthn registration ceremony\n\n**Verify:** `npm run dev` → add a second tool, confirm it appears on `/tools`; add a second passkey.\n\n```json:metadata\n{\"files\":[\"src/pages/admin/tools.astro\",\"src/pages/admin/passkeys.astro\"],\"verifyCommand\":\"npm run dev\",\"acceptanceCriteria\":[\"Tools CRUD works with fetch PUT/DELETE\",\"Display order reordering works\",\"Add tool form works\",\"Passkeys list with delete\",\"Add another passkey runs WebAuthn ceremony\"]}\n```"
     },

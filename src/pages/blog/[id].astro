@@ -1,28 +1,23 @@
 ---
-export const prerender = true;
-
 import Base from '../../layouts/Base.astro';
-import { getCollection, render } from 'astro:content';
+import { getPostBySlug } from '../../lib/db';
 
-export async function getStaticPaths() {
-  const posts = await getCollection('blog');
-  return posts.map(post => ({ params: { id: post.id }, props: { post } }));
+const { id } = Astro.params;
+const post = getPostBySlug(id!);
+
+if (!post || post.published !== 1) {
+  return Astro.redirect('/404', 404);
 }
 
-const { post } = Astro.props;
-const { Content } = await render(post);
+const dateStr = new Date(post.created_at * 1000).toLocaleDateString('en-US', {
+  year: 'numeric', month: 'long', day: 'numeric'
+});
 ---
-<Base title={post.data.title}>
+<Base title={post.title}>
   <article>
-    <h1>{post.data.title}</h1>
-    <time class="date">
-      {post.data.date.toLocaleDateString('en-US', {
-        year: 'numeric', month: 'long', day: 'numeric'
-      })}
-    </time>
-    <div class="content">
-      <Content />
-    </div>
+    <h1>{post.title}</h1>
+    <time class="date">{dateStr}</time>
+    <div class="content" set:html={post.content_html}></div>
   </article>
 </Base>
 
