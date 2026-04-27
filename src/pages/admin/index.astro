@@ -1,0 +1,107 @@
+---
+import AdminBase from '../../layouts/AdminBase.astro';
+import { listPosts, listTools } from '../../lib/db';
+
+const posts = listPosts();
+const tools = listTools();
+---
+<AdminBase title="Dashboard">
+  <div class="dashboard">
+    <section class="section">
+      <div class="section-header">
+        <h2>Posts</h2>
+        <a href="/admin/posts/new" class="btn-sm">+ New Post</a>
+      </div>
+      {posts.length === 0 ? (
+        <p class="empty">No posts yet.</p>
+      ) : (
+        <table class="data-table">
+          <thead><tr><th>Title</th><th>Status</th><th></th></tr></thead>
+          <tbody>
+            {posts.map(post => (
+              <tr>
+                <td><a href={`/admin/posts/${post.id}`}>{post.title}</a></td>
+                <td>
+                  <span class={`badge ${post.published ? 'badge-live' : 'badge-draft'}`}>
+                    {post.published ? 'Live' : 'Draft'}
+                  </span>
+                </td>
+                <td class="actions">
+                  <a href={`/admin/posts/${post.id}`} class="action-link">Edit</a>
+                  <button class="action-delete" data-type="posts" data-id={post.id}>Delete</button>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      )}
+    </section>
+
+    <section class="section">
+      <div class="section-header">
+        <h2>Tools</h2>
+        <a href="/admin/tools" class="btn-sm">Manage Tools</a>
+      </div>
+      {tools.length === 0 ? (
+        <p class="empty">No tools yet.</p>
+      ) : (
+        <table class="data-table">
+          <thead><tr><th>Name</th><th>Status</th><th></th></tr></thead>
+          <tbody>
+            {tools.map(tool => (
+              <tr>
+                <td>{tool.name}</td>
+                <td>
+                  <span class={`badge ${tool.active ? 'badge-live' : 'badge-draft'}`}>
+                    {tool.active ? 'Active' : 'Hidden'}
+                  </span>
+                </td>
+                <td class="actions">
+                  <a href="/admin/tools" class="action-link">Edit</a>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      )}
+    </section>
+  </div>
+</AdminBase>
+
+<style>
+  .dashboard { display: flex; flex-direction: column; gap: 2.5rem; }
+  .section-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.75rem; }
+  h2 { font-size: 0.95rem; font-weight: 600; margin: 0; }
+  .btn-sm {
+    font-size: 0.75rem; padding: 0.25rem 0.6rem; border: 1px solid var(--border);
+    border-radius: 3px; color: var(--text-muted); transition: color 0.15s;
+  }
+  .btn-sm:hover { color: var(--text-secondary); }
+  .empty { color: var(--text-muted); font-size: 0.85rem; }
+  .data-table { width: 100%; border-collapse: collapse; font-size: 0.85rem; }
+  .data-table th { text-align: left; color: var(--text-muted); font-weight: 400; padding: 0.4rem 0.5rem; border-bottom: 1px solid var(--border); }
+  .data-table td { padding: 0.6rem 0.5rem; border-bottom: 1px solid var(--border); }
+  .data-table tr:last-child td { border-bottom: none; }
+  .badge { font-size: 0.7rem; padding: 0.1rem 0.4rem; border-radius: 3px; }
+  .badge-live { background: #14532d; color: #86efac; }
+  .badge-draft { background: var(--surface); color: var(--text-muted); border: 1px solid var(--border); }
+  .actions { display: flex; gap: 0.75rem; }
+  .action-link { color: var(--text-muted); font-size: 0.8rem; }
+  .action-link:hover { color: var(--text-secondary); }
+  .action-delete {
+    background: none; border: none; color: #f87171; font-size: 0.8rem;
+    cursor: pointer; padding: 0; transition: color 0.15s;
+  }
+  .action-delete:hover { color: #fca5a5; }
+</style>
+
+<script>
+  document.querySelectorAll<HTMLButtonElement>('.action-delete').forEach(btn => {
+    btn.addEventListener('click', async () => {
+      if (!confirm(`Delete this ${btn.dataset.type?.slice(0, -1)}?`)) return;
+      const res = await fetch(`/api/${btn.dataset.type}/${btn.dataset.id}`, { method: 'DELETE' });
+      if (res.ok) window.location.reload();
+      else alert('Delete failed');
+    });
+  });
+</script>
