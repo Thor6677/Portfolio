@@ -1,0 +1,50 @@
+---
+import Base from '../../layouts/Base.astro';
+import { getCollection, render } from 'astro:content';
+
+export async function getStaticPaths() {
+  const posts = await getCollection('blog');
+  return posts.map(post => ({ params: { id: post.id } }));
+}
+
+const { id } = Astro.params;
+const posts = await getCollection('blog');
+const post = posts.find(p => p.id === id)!;
+const { Content } = await render(post);
+---
+<Base title={post.data.title}>
+  <article>
+    <h1>{post.data.title}</h1>
+    <time class="date">
+      {post.data.date.toLocaleDateString('en-US', {
+        year: 'numeric', month: 'long', day: 'numeric'
+      })}
+    </time>
+    <div class="content">
+      <Content />
+    </div>
+  </article>
+</Base>
+
+<style>
+  h1 { font-size: 1.25rem; font-weight: 600; margin: 0 0 0.25rem; }
+  .date { color: var(--text-muted); font-size: 0.8rem; display: block; margin-bottom: 2rem; }
+
+  .content { font-size: 0.875rem; line-height: 1.8; color: var(--text-secondary); }
+  .content h2 { font-size: 1rem; font-weight: 600; color: var(--text); margin-top: 2rem; }
+  .content a { color: var(--text-secondary); text-decoration: underline; }
+  .content code {
+    background: var(--surface);
+    padding: 0.1rem 0.3rem;
+    border-radius: 3px;
+    font-size: 0.8em;
+  }
+  .content pre {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 1rem;
+    overflow-x: auto;
+  }
+  .content pre code { background: none; padding: 0; }
+</style>

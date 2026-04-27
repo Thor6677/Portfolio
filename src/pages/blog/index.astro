@@ -1,0 +1,64 @@
+---
+import Base from '../../layouts/Base.astro';
+import { getCollection } from 'astro:content';
+
+const posts = await getCollection('blog');
+const sorted = posts.sort(
+  (a, b) => b.data.date.valueOf() - a.data.date.valueOf()
+);
+---
+<Base title="Blog">
+  <h1>Blog</h1>
+  <p class="subtitle">Dev writeups and notes</p>
+
+  {sorted.length === 0 ? (
+    <div class="empty">Posts coming soon</div>
+  ) : (
+    <ul class="post-list">
+      {sorted.map(post => (
+        <li>
+          <a href={`/blog/${post.id}`} class="post-link">
+            <span class="post-title">{post.data.title}</span>
+            <span class="post-date">
+              {post.data.date.toLocaleDateString('en-US', {
+                year: 'numeric', month: 'short', day: 'numeric'
+              })}
+            </span>
+          </a>
+        </li>
+      ))}
+    </ul>
+  )}
+</Base>
+
+<style>
+  h1 { font-size: 1.25rem; font-weight: 600; margin: 0 0 0.25rem; }
+  .subtitle { color: var(--text-muted); font-size: 0.85rem; margin: 0 0 1.5rem; }
+
+  .empty {
+    background: var(--surface);
+    border: 1px dashed var(--border);
+    border-radius: 6px;
+    padding: 2rem;
+    text-align: center;
+    color: var(--text-muted);
+    font-size: 0.875rem;
+  }
+
+  .post-list { list-style: none; padding: 0; margin: 0; }
+  .post-list li { border-bottom: 1px solid var(--border); }
+  .post-list li:last-child { border-bottom: none; }
+
+  .post-link {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.75rem 0;
+    font-size: 0.875rem;
+    color: var(--text-secondary);
+    transition: color 0.15s;
+  }
+
+  .post-link:hover .post-title { color: var(--text); }
+  .post-date { color: var(--text-muted); font-size: 0.75rem; flex-shrink: 0; }
+</style>
