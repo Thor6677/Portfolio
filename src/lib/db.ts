@@ -198,14 +198,14 @@ export function listPasskeys(): PasskeyCredential[] {
   return getDb().prepare('SELECT * FROM passkey_credentials ORDER BY created_at ASC').all() as PasskeyCredential[];
 }
 
-export function getPasskeyByCredentialId(credentialId: Uint8Array): PasskeyCredential | undefined {
+export function getPasskeyByCredentialId(rawId: string): PasskeyCredential | undefined {
   return getDb().prepare('SELECT * FROM passkey_credentials WHERE credential_id = ?').get(
-    Buffer.from(credentialId),
+    Buffer.from(rawId),
   ) as PasskeyCredential | undefined;
 }
 
 export function createPasskey(data: {
-  credential_id: Uint8Array; public_key: Uint8Array; counter: number; name: string;
+  credential_id: string; public_key: Uint8Array; counter: number; name: string;
 }): void {
   const now = Math.floor(Date.now() / 1000);
   getDb().prepare(`

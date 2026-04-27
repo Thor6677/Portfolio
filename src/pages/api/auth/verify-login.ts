@@ -22,8 +22,7 @@ export const POST: APIRoute = async ({ request, cookies }) => {
   }
 
   const authResponse = body.response as Parameters<typeof verifyAuthenticationResponse>[0]['response'];
-  const credentialId = new Uint8Array(Buffer.from(authResponse.rawId, 'base64url'));
-  const passkey = getPasskeyByCredentialId(credentialId);
+  const passkey = getPasskeyByCredentialId(authResponse.rawId);
   if (!passkey) {
     return new Response(JSON.stringify({ error: 'Passkey not found' }), { status: 400 });
   }
@@ -36,7 +35,7 @@ export const POST: APIRoute = async ({ request, cookies }) => {
       expectedOrigin: ORIGIN,
       expectedRPID: RP_ID,
       credential: {
-        id: new Uint8Array(passkey.credential_id),
+        id: passkey.credential_id.toString(),
         publicKey: new Uint8Array(passkey.public_key),
         counter: passkey.counter,
       },
