@@ -12,6 +12,16 @@
     "astro": "astro"
   },
   "dependencies": {
-    "astro": "^6.1.9"
+    "@astrojs/node": "^10.0.6",
+    "@simplewebauthn/browser": "^13.3.0",
+    "@simplewebauthn/server": "^13.3.0",
+    "@tiptap/core": "^3.22.4",
+    "@tiptap/extension-link": "^3.22.4",
+    "@tiptap/starter-kit": "^3.22.4",
+    "astro": "^6.1.9",
+    "better-sqlite3": "^12.9.0"
+  },
+  "devDependencies": {
+    "@types/better-sqlite3": "^7.6.13"
   }
 }
