@@ -4,12 +4,10 @@ import { getCollection, render } from 'astro:content';
 
 export async function getStaticPaths() {
   const posts = await getCollection('blog');
-  return posts.map(post => ({ params: { id: post.id } }));
+  return posts.map(post => ({ params: { id: post.id }, props: { post } }));
 }
 
-const { id } = Astro.params;
-const posts = await getCollection('blog');
-const post = posts.find(p => p.id === id)!;
+const { post } = Astro.props;
 const { Content } = await render(post);
 ---
 <Base title={post.data.title}>
