@@ -4,7 +4,7 @@
     {
       "id": 8,
       "subject": "Task 0: Install dependencies and configure Astro for SSR",
-      "status": "pending",
+      "status": "completed",
       "description": "**Goal:** Install all required packages and switch Astro from static to server output with Node adapter; mark the two static pages as prerendered.\n\n**Files:**\n- Modify: `package.json`\n- Modify: `astro.config.mjs`\n- Modify: `src/pages/index.astro` (add prerender export)\n- Modify: `src/pages/about.astro` (add prerender export)\n- Create: `.env.example`\n- Modify: `.gitignore` (add `data/`)\n\n**Acceptance Criteria:**\n- [ ] `npm run build` succeeds\n- [ ] `ls dist/server/entry.mjs` → file exists\n- [ ] `/` and `/about` are prerendered (in `dist/client/`)\n- [ ] All new packages installed\n\n**Verify:** `npm run build && ls dist/server/entry.mjs` → file exists\n\n```json:metadata\n{\"files\":[\"package.json\",\"astro.config.mjs\",\"src/pages/index.astro\",\"src/pages/about.astro\",\".env.example\",\".gitignore\"],\"verifyCommand\":\"npm run build && ls dist/server/entry.mjs\",\"acceptanceCriteria\":[\"npm run build succeeds\",\"dist/server/entry.mjs exists\",\"index.astro and about.astro have export const prerender = true\"]}\n```"
     },
     {
@@ -52,7 +52,7 @@
     {
       "id": 15,
       "subject": "Task 7: Post editor",
-      "status": "pending",
+      "status": "completed",
       "blockedBy": [14],
       "description": "**Goal:** Build the TipTap-powered post editor for creating and editing blog posts at `/admin/posts/new` and `/admin/posts/[id]`.\n\n**Files:**\n- Create: `src/pages/admin/posts/new.astro`\n- Create: `src/pages/admin/posts/[id].astro`\n\n**Acceptance Criteria:**\n- [ ] TipTap editor renders with toolbar (Bold, Italic, H2, H3, Code, Code Block, Link, Bullet List, Ordered List)\n- [ ] Title auto-generates slug on change\n- [ ] Save submits via fetch PUT (edit) or fetch POST (new) and redirects to `/admin`\n- [ ] Edit page pre-fills all fields from existing post (initial content via JSON data tag, not define:vars)\n- [ ] Published toggle works\n\n**Verify:** `npm run dev` → create a post, confirm it appears on dashboard; visit `/blog/<slug>` confirms it's live.\n\n```json:metadata\n{\"files\":[\"src/pages/admin/posts/new.astro\",\"src/pages/admin/posts/[id].astro\"],\"verifyCommand\":\"npm run dev\",\"acceptanceCriteria\":[\"TipTap editor renders with toolbar\",\"Title auto-generates slug\",\"Save via fetch redirects to /admin\",\"Edit page pre-fills from JSON data tag\",\"Published toggle works\"]}\n```"
     },
@@ -78,5 +78,5 @@
       "description": "**Goal:** Replace the static nginx Docker setup with a multi-stage Node.js Docker build. Update `docker-compose.yml` for the Node container with a SQLite data volume. Update `deploy.sh` to push code and rebuild on VPS. Update `thunderborn.conf` in vigilant-vps to proxy to port 3000. Perform first deploy.\n\n**Files:**\n- Create: `Dockerfile` (in Portfolio repo)\n- Modify: `docker-compose.yml` (Portfolio repo)\n- Modify: `deploy.sh` (Portfolio repo)\n- Delete: `nginx.conf` (Portfolio repo — no longer used)\n- Modify: `~/Documents/Personal/vigilant-vps/nginx/thunderborn.conf` — change upstream to port 3000\n\n**Acceptance Criteria:**\n- [ ] `docker build .` succeeds\n- [ ] `docker run` starts app on port 3000\n- [ ] SQLite data volume persists across image rebuilds\n- [ ] `thunderborn.conf` upstream changed from `http://portfolio` to `http://portfolio:3000`\n- [ ] `curl -s -o /dev/null -w \"%{http_code}\" https://thunderborn.dev` → `200`\n\n**Verify:** `curl -s -o /dev/null -w \"%{http_code}\" https://thunderborn.dev` → `200`\n\n```json:metadata\n{\"files\":[\"Dockerfile\",\"docker-compose.yml\",\"deploy.sh\",\"nginx.conf\",\"../vigilant-vps/nginx/thunderborn.conf\"],\"verifyCommand\":\"curl -s -o /dev/null -w \\\"%{http_code}\\\" https://thunderborn.dev\",\"acceptanceCriteria\":[\"docker build succeeds\",\"App runs on port 3000\",\"SQLite volume persists\",\"thunderborn.conf upstream is port 3000\",\"https://thunderborn.dev returns 200\"]}\n```"
     }
   ],
-  "lastUpdated": "2026-04-26T00:00:00Z"
+  "lastUpdated": "2026-04-27T15:38:00Z"
 }

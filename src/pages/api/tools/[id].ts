@@ -27,7 +27,7 @@ export const PUT: APIRoute = async ({ params, request }) => {
   }
 
   updateTool(id, { name, url, description, tags, display_order, active });
-  return new Response(null, { status: 302, headers: { Location: '/admin/tools' } });
+  return new Response(JSON.stringify({ ok: true }), { headers: { 'Content-Type': 'application/json' } });
 };
 
 export const DELETE: APIRoute = async ({ params }) => {

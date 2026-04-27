@@ -1,0 +1,319 @@
+---
+import AdminBase from '../../layouts/AdminBase.astro';
+import { listTools } from '../../lib/db';
+
+const tools = listTools();
+---
+<AdminBase title="Tools">
+  <div class="page-header">
+    <h1 class="page-title">Tools</h1>
+  </div>
+
+  {tools.length === 0 ? (
+    <p class="empty">No tools yet.</p>
+  ) : (
+    <table class="data-table" id="tools-table">
+      <thead>
+        <tr>
+          <th>Order</th>
+          <th>Name</th>
+          <th>Status</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody>
+        {tools.map(tool => (
+          <tr
+            id={`row-${tool.id}`}
+            data-id={tool.id}
+            data-name={tool.name}
+            data-url={tool.url}
+            data-description={tool.description}
+            data-tags={JSON.parse(tool.tags).join(', ')}
+            data-display-order={tool.display_order}
+            data-active={tool.active}
+          >
+            <td class="order-cell">
+              <button class="order-btn" data-dir="up" data-id={tool.id} title="Move up">↑</button>
+              <button class="order-btn" data-dir="down" data-id={tool.id} title="Move down">↓</button>
+            </td>
+            <td>
+              <a href={tool.url} target="_blank" rel="noopener" class="tool-name">{tool.name}</a>
+            </td>
+            <td>
+              <span class={`badge ${tool.active ? 'badge-active' : 'badge-hidden'}`}>
+                {tool.active ? 'Active' : 'Hidden'}
+              </span>
+            </td>
+            <td class="actions">
+              <button class="action-link edit-btn" data-id={tool.id}>Edit</button>
+              <button class="action-delete" data-id={tool.id}>Delete</button>
+            </td>
+          </tr>
+          <tr id={`edit-row-${tool.id}`} class="edit-row" hidden>
+            <td colspan="4">
+              <form class="edit-form" data-id={tool.id}>
+                <div class="form-grid">
+                  <div class="field">
+                    <label>Name</label>
+                    <input type="text" name="name" value={tool.name} required />
+                  </div>
+                  <div class="field">
+                    <label>URL</label>
+                    <input type="url" name="url" value={tool.url} required />
+                  </div>
+                  <div class="field field-full">
+                    <label>Description</label>
+                    <textarea name="description" rows="2">{tool.description}</textarea>
+                  </div>
+                  <div class="field">
+                    <label>Tags <span class="hint-text">(comma-separated)</span></label>
+                    <input type="text" name="tags" value={JSON.parse(tool.tags).join(', ')} />
+                  </div>
+                  <div class="field">
+                    <label>Display Order</label>
+                    <input type="number" name="display_order" value={tool.display_order} />
+                  </div>
+                  <div class="field field-check">
+                    <label class="check-label">
+                      <input type="checkbox" name="active" value="1" checked={tool.active === 1} />
+                      Active
+                    </label>
+                  </div>
+                </div>
+                <div class="form-actions">
+                  <button type="submit" class="btn-save">Save</button>
+                  <button type="button" class="btn-cancel cancel-edit-btn" data-id={tool.id}>Cancel</button>
+                  <span class="save-status" hidden></span>
+                </div>
+              </form>
+            </td>
+          </tr>
+        ))}
+      </tbody>
+    </table>
+  )}
+
+  <section class="add-section">
+    <h2 class="section-title">Add Tool</h2>
+    <form id="add-form" class="edit-form">
+      <div class="form-grid">
+        <div class="field">
+          <label>Name</label>
+          <input type="text" name="name" required autocomplete="off" />
+        </div>
+        <div class="field">
+          <label>URL</label>
+          <input type="url" name="url" required autocomplete="off" />
+        </div>
+        <div class="field field-full">
+          <label>Description</label>
+          <textarea name="description" rows="2"></textarea>
+        </div>
+        <div class="field">
+          <label>Tags <span class="hint-text">(comma-separated)</span></label>
+          <input type="text" name="tags" autocomplete="off" />
+        </div>
+      </div>
+      <div class="form-actions">
+        <button type="submit" class="btn-save">Add Tool</button>
+        <span class="save-status" hidden></span>
+      </div>
+    </form>
+  </section>
+</AdminBase>
+
+<style>
+  .page-header { margin-bottom: 1.5rem; }
+  .page-title { font-size: 1.1rem; font-weight: 600; margin: 0; }
+  .empty { color: var(--text-muted); font-size: 0.85rem; }
+
+  .data-table { width: 100%; border-collapse: collapse; font-size: 0.85rem; margin-bottom: 2rem; }
+  .data-table th {
+    text-align: left; color: var(--text-muted); font-weight: 400;
+    padding: 0.4rem 0.5rem; border-bottom: 1px solid var(--border);
+  }
+  .data-table td { padding: 0.6rem 0.5rem; border-bottom: 1px solid var(--border); vertical-align: middle; }
+  .data-table tr:last-child td { border-bottom: none; }
+
+  .tool-name { color: var(--text-secondary); }
+  .tool-name:hover { color: var(--text); }
+
+  .order-cell { white-space: nowrap; width: 60px; }
+  .order-btn {
+    background: none; border: 1px solid var(--border); border-radius: 3px;
+    color: var(--text-muted); font-size: 0.75rem; padding: 0.1rem 0.3rem;
+    cursor: pointer; transition: color 0.15s;
+  }
+  .order-btn:hover { color: var(--text-secondary); }
+
+  .badge { font-size: 0.7rem; padding: 0.1rem 0.4rem; border-radius: 3px; }
+  .badge-active { background: #14532d; color: #86efac; }
+  .badge-hidden { background: var(--surface); color: var(--text-muted); border: 1px solid var(--border); }
+
+  .actions { display: flex; gap: 0.75rem; white-space: nowrap; }
+  .action-link {
+    background: none; border: none; color: var(--text-muted); font-size: 0.8rem;
+    cursor: pointer; padding: 0; transition: color 0.15s;
+  }
+  .action-link:hover { color: var(--text-secondary); }
+  .action-delete {
+    background: none; border: none; color: #f87171; font-size: 0.8rem;
+    cursor: pointer; padding: 0; transition: color 0.15s;
+  }
+  .action-delete:hover { color: #fca5a5; }
+
+  .edit-row td { padding: 0.75rem 0.5rem; background: var(--surface); }
+
+  .edit-form { display: flex; flex-direction: column; gap: 0.75rem; }
+  .form-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.6rem 1rem;
+  }
+  .field { display: flex; flex-direction: column; gap: 0.25rem; }
+  .field-full { grid-column: 1 / -1; }
+  .field-check { justify-content: flex-end; }
+  label { font-size: 0.75rem; color: var(--text-muted); }
+  .hint-text { font-weight: 400; font-size: 0.7rem; }
+  input[type="text"], input[type="url"], input[type="number"], textarea {
+    background: var(--bg); border: 1px solid var(--border); border-radius: 4px;
+    padding: 0.4rem 0.6rem; color: var(--text); font-size: 0.8rem;
+    font-family: inherit; resize: vertical;
+  }
+  input:focus, textarea:focus { outline: 1px solid var(--text-muted); }
+  .check-label {
+    display: flex; gap: 0.4rem; align-items: center;
+    font-size: 0.8rem; color: var(--text-secondary); cursor: pointer;
+  }
+
+  .form-actions { display: flex; gap: 0.75rem; align-items: center; }
+  .btn-save {
+    background: var(--text); color: var(--bg); border: none; border-radius: 4px;
+    padding: 0.4rem 1rem; font-size: 0.8rem; font-weight: 600; cursor: pointer;
+  }
+  .btn-save:hover { opacity: 0.85; }
+  .btn-cancel {
+    background: none; border: 1px solid var(--border); border-radius: 4px;
+    color: var(--text-muted); font-size: 0.8rem; padding: 0.4rem 0.75rem; cursor: pointer;
+  }
+  .btn-cancel:hover { color: var(--text-secondary); }
+  .save-status { font-size: 0.75rem; color: #86efac; }
+
+  .add-section { margin-top: 2rem; padding-top: 1.5rem; border-top: 1px solid var(--border); }
+  .section-title { font-size: 0.9rem; font-weight: 600; margin: 0 0 1rem; }
+</style>
+
+<script>
+  function getRow(id: string | number): HTMLTableRowElement | null {
+    return document.getElementById(`row-${id}`) as HTMLTableRowElement | null;
+  }
+  function getEditRow(id: string | number): HTMLTableRowElement | null {
+    return document.getElementById(`edit-row-${id}`) as HTMLTableRowElement | null;
+  }
+
+  // Toggle edit form open/close
+  document.querySelectorAll<HTMLButtonElement>('.edit-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const id = btn.dataset.id!;
+      const editRow = getEditRow(id);
+      if (!editRow) return;
+      const isOpen = !editRow.hidden;
+      editRow.hidden = isOpen;
+      btn.textContent = isOpen ? 'Edit' : 'Cancel';
+    });
+  });
+
+  document.querySelectorAll<HTMLButtonElement>('.cancel-edit-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const id = btn.dataset.id!;
+      const editRow = getEditRow(id);
+      if (!editRow) return;
+      editRow.hidden = true;
+      const editBtn = document.querySelector<HTMLButtonElement>(`.edit-btn[data-id="${id}"]`);
+      if (editBtn) editBtn.textContent = 'Edit';
+    });
+  });
+
+  // Submit inline edit forms
+  document.querySelectorAll<HTMLFormElement>('.edit-form[data-id]').forEach(form => {
+    form.addEventListener('submit', async e => {
+      e.preventDefault();
+      const id = form.dataset.id!;
+      const data = new FormData(form);
+      // active checkbox: if unchecked, it won't be in FormData — force it to '0'
+      if (!data.has('active')) data.set('active', '0');
+      const saveBtn = form.querySelector<HTMLButtonElement>('.btn-save')!;
+      const statusEl = form.querySelector<HTMLElement>('.save-status')!;
+      saveBtn.disabled = true;
+      statusEl.hidden = true;
+      const res = await fetch(`/api/tools/${id}`, { method: 'PUT', body: data });
+      saveBtn.disabled = false;
+      if (res.ok) {
+        window.location.reload();
+      } else {
+        const json = await res.json().catch(() => ({}));
+        alert(json.error ?? 'Save failed');
+      }
+    });
+  });
+
+  // Delete tool
+  document.querySelectorAll<HTMLButtonElement>('.action-delete').forEach(btn => {
+    btn.addEventListener('click', async () => {
+      const id = btn.dataset.id!;
+      if (!confirm('Delete this tool?')) return;
+      const res = await fetch(`/api/tools/${id}`, { method: 'DELETE' });
+      if (res.ok) {
+        getRow(id)?.remove();
+        getEditRow(id)?.remove();
+      } else {
+        alert('Delete failed');
+      }
+    });
+  });
+
+  // Reorder ↑/↓ — must send full tool data so PUT doesn't lose other fields
+  document.querySelectorAll<HTMLButtonElement>('.order-btn').forEach(btn => {
+    btn.addEventListener('click', async () => {
+      const id = btn.dataset.id!;
+      const dir = btn.dataset.dir as 'up' | 'down';
+      const row = getRow(id);
+      if (!row) return;
+      const currentOrder = parseInt(row.dataset.displayOrder ?? '0', 10);
+      const newOrder = dir === 'up' ? currentOrder - 1 : currentOrder + 1;
+
+      const data = new FormData();
+      data.set('name', row.dataset.name ?? '');
+      data.set('url', row.dataset.url ?? '');
+      data.set('description', row.dataset.description ?? '');
+      data.set('tags', row.dataset.tags ?? '');
+      data.set('display_order', String(newOrder));
+      data.set('active', row.dataset.active ?? '0');
+
+      const res = await fetch(`/api/tools/${id}`, { method: 'PUT', body: data });
+      if (res.ok) {
+        window.location.reload();
+      } else {
+        alert('Reorder failed');
+      }
+    });
+  });
+
+  // Add tool form
+  document.getElementById('add-form')!.addEventListener('submit', async e => {
+    e.preventDefault();
+    const form = e.currentTarget as HTMLFormElement;
+    const data = new FormData(form);
+    const saveBtn = form.querySelector<HTMLButtonElement>('.btn-save')!;
+    saveBtn.disabled = true;
+    const res = await fetch('/api/tools', { method: 'POST', body: data });
+    saveBtn.disabled = false;
+    if (res.ok) {
+      window.location.reload();
+    } else {
+      const json = await res.json().catch(() => ({}));
+      alert(json.error ?? 'Add failed');
+    }
+  });
+</script>

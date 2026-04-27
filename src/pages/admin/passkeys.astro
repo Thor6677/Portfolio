@@ -1,0 +1,130 @@
+---
+import AdminBase from '../../layouts/AdminBase.astro';
+import { listPasskeys } from '../../lib/db';
+
+const passkeys = listPasskeys();
+---
+<AdminBase title="Passkeys">
+  <div class="page-header">
+    <h1 class="page-title">Passkeys</h1>
+  </div>
+
+  {passkeys.length === 0 ? (
+    <p class="empty">No passkeys registered.</p>
+  ) : (
+    <table class="data-table" id="passkeys-table">
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Added</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody>
+        {passkeys.map(pk => (
+          <tr id={`pk-row-${pk.id}`}>
+            <td>{pk.name}</td>
+            <td class="date-cell">
+              {new Date(pk.created_at * 1000).toLocaleDateString('en-US', {
+                year: 'numeric', month: 'short', day: 'numeric'
+              })}
+            </td>
+            <td class="actions">
+              <button class="action-delete" data-id={pk.id}>Delete</button>
+            </td>
+          </tr>
+        ))}
+      </tbody>
+    </table>
+  )}
+
+  <section class="add-section">
+    <h2 class="section-title">Add another passkey</h2>
+    <p class="hint">Register a new device or security key with your existing session.</p>
+    <button id="add-passkey-btn" class="btn-add">Register passkey</button>
+    <p id="add-error" class="error-msg" hidden></p>
+  </section>
+</AdminBase>
+
+<style>
+  .page-header { margin-bottom: 1.5rem; }
+  .page-title { font-size: 1.1rem; font-weight: 600; margin: 0; }
+  .empty { color: var(--text-muted); font-size: 0.85rem; }
+
+  .data-table { width: 100%; border-collapse: collapse; font-size: 0.85rem; margin-bottom: 2rem; }
+  .data-table th {
+    text-align: left; color: var(--text-muted); font-weight: 400;
+    padding: 0.4rem 0.5rem; border-bottom: 1px solid var(--border);
+  }
+  .data-table td { padding: 0.6rem 0.5rem; border-bottom: 1px solid var(--border); vertical-align: middle; }
+  .data-table tr:last-child td { border-bottom: none; }
+
+  .date-cell { color: var(--text-muted); font-size: 0.8rem; }
+
+  .actions { white-space: nowrap; }
+  .action-delete {
+    background: none; border: none; color: #f87171; font-size: 0.8rem;
+    cursor: pointer; padding: 0; transition: color 0.15s;
+  }
+  .action-delete:hover { color: #fca5a5; }
+
+  .add-section { margin-top: 2rem; padding-top: 1.5rem; border-top: 1px solid var(--border); }
+  .section-title { font-size: 0.9rem; font-weight: 600; margin: 0 0 0.4rem; }
+  .hint { font-size: 0.8rem; color: var(--text-muted); margin: 0 0 1rem; }
+  .btn-add {
+    background: var(--text); color: var(--bg); border: none; border-radius: 4px;
+    padding: 0.5rem 1.25rem; font-size: 0.875rem; font-weight: 600; cursor: pointer;
+    transition: opacity 0.15s;
+  }
+  .btn-add:hover { opacity: 0.85; }
+  .btn-add:disabled { opacity: 0.5; cursor: default; }
+  .error-msg { color: #f87171; font-size: 0.8rem; margin-top: 0.75rem; }
+</style>
+
+<script>
+  import { startRegistration } from '@simplewebauthn/browser';
+
+  // Delete passkey
+  document.querySelectorAll<HTMLButtonElement>('.action-delete').forEach(btn => {
+    btn.addEventListener('click', async () => {
+      const id = btn.dataset.id!;
+      if (!confirm('Delete this passkey? You cannot undo this.')) return;
+      const res = await fetch(`/api/passkeys/${id}`, { method: 'DELETE' });
+      if (res.ok) {
+        document.getElementById(`pk-row-${id}`)?.remove();
+      } else {
+        const json = await res.json().catch(() => ({}));
+        alert(json.error ?? 'Delete failed');
+      }
+    });
+  });
+
+  // Add passkey — WebAuthn registration ceremony
+  const addBtn = document.getElementById('add-passkey-btn') as HTMLButtonElement;
+  const errEl = document.getElementById('add-error') as HTMLElement;
+
+  addBtn.addEventListener('click', async () => {
+    addBtn.disabled = true;
+    errEl.hidden = true;
+    try {
+      const { challengeToken, options } = await fetch('/api/auth/register-challenge').then(r => r.json());
+      const credential = await startRegistration({ optionsJSON: options });
+      const res = await fetch('/api/auth/verify-registration', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ challengeToken, credential }),
+      });
+      if (res.ok) {
+        window.location.reload();
+      } else {
+        const json = await res.json().catch(() => ({}));
+        throw new Error(json.error ?? 'Registration failed');
+      }
+    } catch (err: unknown) {
+      errEl.textContent = err instanceof Error ? err.message : 'Registration failed';
+      errEl.hidden = false;
+    } finally {
+      addBtn.disabled = false;
+    }
+  });
+</script>
