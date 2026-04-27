@@ -24,7 +24,7 @@ export const GET: APIRoute = async ({ url, cookies }) => {
     userDisplayName: 'Admin',
     attestationType: 'none',
     excludeCredentials: existingPasskeys.map(p => ({
-      id: new Uint8Array(p.credential_id),
+      id: p.credential_id.toString('base64url'),
       type: 'public-key' as const,
     })),
     authenticatorSelection: {
