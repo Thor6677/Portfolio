@@ -1,0 +1,17 @@
+services:
+  portfolio:
+    image: nginx:alpine
+    container_name: portfolio
+    restart: unless-stopped
+    volumes:
+      - ./www:/usr/share/nginx/html:ro
+      - ./nginx.conf:/etc/nginx/conf.d/default.conf:ro
+    networks:
+      - web
+    security_opt:
+      - no-new-privileges:true
+
+networks:
+  web:
+    external: true
+    name: web
