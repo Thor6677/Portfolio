@@ -66,14 +66,14 @@
     {
       "id": 17,
       "subject": "Task 9: Rewrite public blog and tools pages to use SQLite",
-      "status": "pending",
+      "status": "completed",
       "blockedBy": [15, 16],
       "description": "**Goal:** Replace the static Content Collections-based blog and hardcoded tools page with server-rendered versions that query SQLite. Delete `content.config.ts` and the blog content directory.\n\n**Files:**\n- Modify: `src/pages/blog/index.astro`\n- Modify: `src/pages/blog/[id].astro`\n- Modify: `src/pages/tools.astro`\n- Delete: `src/content.config.ts`\n- Delete: `src/content/blog/.gitkeep` (and directory)\n\n**Acceptance Criteria:**\n- [ ] `/blog` lists published posts ordered by `created_at DESC`\n- [ ] `/blog/[slug]` renders `content_html` for published post; returns 404 for missing/unpublished\n- [ ] `/tools` lists active tools ordered by `display_order ASC`\n- [ ] Content Collections config deleted; `npm run build` succeeds without it\n\n**Verify:** `npm run build` → no errors; `npm run dev` → `/tools` shows Vigilant card from DB (seeded); create a published post in admin, confirm it appears on `/blog`.\n\n```json:metadata\n{\"files\":[\"src/pages/blog/index.astro\",\"src/pages/blog/[id].astro\",\"src/pages/tools.astro\",\"src/content.config.ts\",\"src/content/blog/.gitkeep\"],\"verifyCommand\":\"npm run build\",\"acceptanceCriteria\":[\"/blog lists published posts\",\"/blog/[slug] renders content_html\",\"/tools queries SQLite\",\"content.config.ts deleted\"]}\n```"
     },
     {
       "id": 18,
       "subject": "Task 10: Docker build, deploy infrastructure, and nginx port update",
-      "status": "pending",
+      "status": "completed",
       "blockedBy": [17],
       "description": "**Goal:** Replace the static nginx Docker setup with a multi-stage Node.js Docker build. Update `docker-compose.yml` for the Node container with a SQLite data volume. Update `deploy.sh` to push code and rebuild on VPS. Update `thunderborn.conf` in vigilant-vps to proxy to port 3000. Perform first deploy.\n\n**Files:**\n- Create: `Dockerfile` (in Portfolio repo)\n- Modify: `docker-compose.yml` (Portfolio repo)\n- Modify: `deploy.sh` (Portfolio repo)\n- Delete: `nginx.conf` (Portfolio repo — no longer used)\n- Modify: `~/Documents/Personal/vigilant-vps/nginx/thunderborn.conf` — change upstream to port 3000\n\n**Acceptance Criteria:**\n- [ ] `docker build .` succeeds\n- [ ] `docker run` starts app on port 3000\n- [ ] SQLite data volume persists across image rebuilds\n- [ ] `thunderborn.conf` upstream changed from `http://portfolio` to `http://portfolio:3000`\n- [ ] `curl -s -o /dev/null -w \"%{http_code}\" https://thunderborn.dev` → `200`\n\n**Verify:** `curl -s -o /dev/null -w \"%{http_code}\" https://thunderborn.dev` → `200`\n\n```json:metadata\n{\"files\":[\"Dockerfile\",\"docker-compose.yml\",\"deploy.sh\",\"nginx.conf\",\"../vigilant-vps/nginx/thunderborn.conf\"],\"verifyCommand\":\"curl -s -o /dev/null -w \\\"%{http_code}\\\" https://thunderborn.dev\",\"acceptanceCriteria\":[\"docker build succeeds\",\"App runs on port 3000\",\"SQLite volume persists\",\"thunderborn.conf upstream is port 3000\",\"https://thunderborn.dev returns 200\"]}\n```"
     }
