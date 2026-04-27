@@ -1,0 +1,82 @@
+{
+  "planPath": "docs/superpowers/plans/2026-04-26-portfolio-admin.md",
+  "tasks": [
+    {
+      "id": 8,
+      "subject": "Task 0: Install dependencies and configure Astro for SSR",
+      "status": "pending",
+      "description": "**Goal:** Install all required packages and switch Astro from static to server output with Node adapter; mark the two static pages as prerendered.\n\n**Files:**\n- Modify: `package.json`\n- Modify: `astro.config.mjs`\n- Modify: `src/pages/index.astro` (add prerender export)\n- Modify: `src/pages/about.astro` (add prerender export)\n- Create: `.env.example`\n- Modify: `.gitignore` (add `data/`)\n\n**Acceptance Criteria:**\n- [ ] `npm run build` succeeds\n- [ ] `ls dist/server/entry.mjs` → file exists\n- [ ] `/` and `/about` are prerendered (in `dist/client/`)\n- [ ] All new packages installed\n\n**Verify:** `npm run build && ls dist/server/entry.mjs` → file exists\n\n```json:metadata\n{\"files\":[\"package.json\",\"astro.config.mjs\",\"src/pages/index.astro\",\"src/pages/about.astro\",\".env.example\",\".gitignore\"],\"verifyCommand\":\"npm run build && ls dist/server/entry.mjs\",\"acceptanceCriteria\":[\"npm run build succeeds\",\"dist/server/entry.mjs exists\",\"index.astro and about.astro have export const prerender = true\"]}\n```"
+    },
+    {
+      "id": 9,
+      "subject": "Task 1: Database layer",
+      "status": "pending",
+      "blockedBy": [8],
+      "description": "**Goal:** Create `src/lib/db.ts` with all SQLite operations — schema init, seeding, and typed query functions for posts, tools, passkeys, sessions, challenges, and setup tokens.\n\n**Files:**\n- Create: `src/lib/db.ts`\n\n**Acceptance Criteria:**\n- [ ] All 6 tables created on first run\n- [ ] Vigilant tool seeded if tools table is empty\n- [ ] All typed query functions exported\n- [ ] `npm run build` → no errors\n\n**Verify:** `npm run build` → no errors\n\n```json:metadata\n{\"files\":[\"src/lib/db.ts\"],\"verifyCommand\":\"npm run build\",\"acceptanceCriteria\":[\"All 6 tables created on first run\",\"Vigilant tool seeded if tools table is empty\",\"All typed query functions exported\",\"npm run build succeeds\"]}\n```"
+    },
+    {
+      "id": 10,
+      "subject": "Task 2: Auth middleware",
+      "status": "pending",
+      "blockedBy": [9],
+      "description": "**Goal:** Create `src/middleware.ts` that guards all `/admin/*` and `/api/*` routes (except `/api/auth/*`) with a session cookie check, and logs the first-time setup token to stdout on the first request if no passkeys are registered.\n\n**Files:**\n- Create: `src/middleware.ts`\n\n**Acceptance Criteria:**\n- [ ] Unauthenticated request to `/admin` redirects to `/admin/login`\n- [ ] Unauthenticated request to `/api/posts` returns 401 JSON\n- [ ] `/api/auth/*` requests pass through without auth check\n- [ ] Setup token logged to stdout on first request when no passkeys exist\n\n**Verify:** `npm run build` → no errors; `npm run dev` → `curl -s http://localhost:4321/admin` returns redirect to `/admin/login`\n\n```json:metadata\n{\"files\":[\"src/middleware.ts\"],\"verifyCommand\":\"npm run build\",\"acceptanceCriteria\":[\"Unauthenticated /admin redirects to /admin/login\",\"Unauthenticated /api/posts returns 401\",\"Setup token logged when no passkeys registered\"]}\n```"
+    },
+    {
+      "id": 11,
+      "subject": "Task 3: WebAuthn API endpoints",
+      "status": "pending",
+      "blockedBy": [10],
+      "description": "**Goal:** Implement the five `/api/auth/*` endpoints that handle passkey login challenge/verify, registration challenge/verify, and logout.\n\n**Files:**\n- Create: `src/pages/api/auth/login-challenge.ts`\n- Create: `src/pages/api/auth/verify-login.ts`\n- Create: `src/pages/api/auth/register-challenge.ts`\n- Create: `src/pages/api/auth/verify-registration.ts`\n- Create: `src/pages/api/auth/logout.ts`\n\n**Acceptance Criteria:**\n- [ ] `GET /api/auth/login-challenge` returns `{ challengeToken, options }` JSON\n- [ ] `POST /api/auth/verify-login` with valid assertion sets session cookie and returns `{ ok: true }`\n- [ ] `GET /api/auth/register-challenge?token=<setupToken>` validates setup token and returns options\n- [ ] `POST /api/auth/verify-registration` stores credential and returns `{ ok: true }`\n- [ ] `POST /api/auth/logout` clears session cookie\n- [ ] `npm run build` → no errors\n\n**Verify:** `npm run build` → no errors\n\n```json:metadata\n{\"files\":[\"src/pages/api/auth/login-challenge.ts\",\"src/pages/api/auth/verify-login.ts\",\"src/pages/api/auth/register-challenge.ts\",\"src/pages/api/auth/verify-registration.ts\",\"src/pages/api/auth/logout.ts\"],\"verifyCommand\":\"npm run build\",\"acceptanceCriteria\":[\"login-challenge returns challengeToken + options\",\"verify-login sets session cookie\",\"register-challenge validates setup token\",\"verify-registration stores credential\",\"logout clears cookie\"]}\n```"
+    },
+    {
+      "id": 12,
+      "subject": "Task 4: Admin login and setup pages",
+      "status": "pending",
+      "blockedBy": [11],
+      "description": "**Goal:** Build the `AdminBase.astro` layout and the two unauthenticated admin pages: `/admin/login` (passkey sign-in) and `/admin/setup` (first-time passkey registration protected by a one-time token).\n\n**Files:**\n- Create: `src/layouts/AdminBase.astro`\n- Create: `src/pages/admin/login.astro`\n- Create: `src/pages/admin/setup.astro`\n\n**Acceptance Criteria:**\n- [ ] Visiting `/admin` redirects to `/admin/login`\n- [ ] `/admin/login` renders without JS errors\n- [ ] `/admin/setup?token=<valid>` renders registration form\n- [ ] `/admin/setup?token=<invalid>` renders 403 error\n\n**Verify:** `npm run dev` → visit `/admin`, confirm redirect to `/admin/login`; page renders without JS errors.\n\n```json:metadata\n{\"files\":[\"src/layouts/AdminBase.astro\",\"src/pages/admin/login.astro\",\"src/pages/admin/setup.astro\"],\"verifyCommand\":\"npm run dev\",\"acceptanceCriteria\":[\"AdminBase layout renders correctly\",\"login page renders without JS errors\",\"setup page validates token correctly\"]}\n```"
+    },
+    {
+      "id": 13,
+      "subject": "Task 5: Content API endpoints",
+      "status": "pending",
+      "blockedBy": [10],
+      "description": "**Goal:** Implement REST API routes for creating, updating, and deleting posts, tools, and passkeys. All are protected by the middleware session guard.\n\n**Files:**\n- Create: `src/pages/api/posts/index.ts`\n- Create: `src/pages/api/posts/[id].ts`\n- Create: `src/pages/api/tools/index.ts`\n- Create: `src/pages/api/tools/[id].ts`\n- Create: `src/pages/api/passkeys/[id].ts`\n\n**Acceptance Criteria:**\n- [ ] `POST /api/posts` creates a post and returns `{ id }`\n- [ ] `PUT /api/posts/[id]` updates post fields\n- [ ] `DELETE /api/posts/[id]` deletes post\n- [ ] `POST /api/tools` creates a tool\n- [ ] `PUT /api/tools/[id]` updates tool\n- [ ] `DELETE /api/tools/[id]` deletes tool\n- [ ] `DELETE /api/passkeys/[id]` deletes passkey\n\n**Verify:** `npm run build` → no errors\n\n```json:metadata\n{\"files\":[\"src/pages/api/posts/index.ts\",\"src/pages/api/posts/[id].ts\",\"src/pages/api/tools/index.ts\",\"src/pages/api/tools/[id].ts\",\"src/pages/api/passkeys/[id].ts\"],\"verifyCommand\":\"npm run build\",\"acceptanceCriteria\":[\"POST /api/posts creates post\",\"PUT /api/posts/[id] updates post\",\"DELETE /api/posts/[id] deletes post\",\"CRUD for tools works\",\"DELETE /api/passkeys/[id] works\"]}\n```"
+    },
+    {
+      "id": 14,
+      "subject": "Task 6: Admin dashboard",
+      "status": "pending",
+      "blockedBy": [13, 12],
+      "description": "**Goal:** Build `/admin/index.astro` — the main dashboard listing all posts (with draft/published status) and all tools, with edit links and delete buttons.\n\n**Files:**\n- Create: `src/pages/admin/index.astro`\n\n**Acceptance Criteria:**\n- [ ] Dashboard shows all posts with draft/published badge\n- [ ] Dashboard shows all tools with display order\n- [ ] Edit links navigate to correct routes\n- [ ] Delete buttons call correct API endpoints via fetch\n- [ ] \"New Post\" and \"Add Tool\" buttons visible\n\n**Verify:** `npm run dev` → after auth, dashboard shows seeded Vigilant tool; create a test post via API and confirm it appears.\n\n```json:metadata\n{\"files\":[\"src/pages/admin/index.astro\"],\"verifyCommand\":\"npm run dev\",\"acceptanceCriteria\":[\"Posts listed with draft/published badge\",\"Tools listed with edit links\",\"Delete buttons work\",\"New Post and Add Tool buttons present\"]}\n```"
+    },
+    {
+      "id": 15,
+      "subject": "Task 7: Post editor",
+      "status": "pending",
+      "blockedBy": [14],
+      "description": "**Goal:** Build the TipTap-powered post editor for creating and editing blog posts at `/admin/posts/new` and `/admin/posts/[id]`.\n\n**Files:**\n- Create: `src/pages/admin/posts/new.astro`\n- Create: `src/pages/admin/posts/[id].astro`\n\n**Acceptance Criteria:**\n- [ ] TipTap editor renders with toolbar (Bold, Italic, H2, H3, Code, Code Block, Link, Bullet List, Ordered List)\n- [ ] Title auto-generates slug on change\n- [ ] Save submits via fetch PUT (edit) or fetch POST (new) and redirects to `/admin`\n- [ ] Edit page pre-fills all fields from existing post (initial content via JSON data tag, not define:vars)\n- [ ] Published toggle works\n\n**Verify:** `npm run dev` → create a post, confirm it appears on dashboard; visit `/blog/<slug>` confirms it's live.\n\n```json:metadata\n{\"files\":[\"src/pages/admin/posts/new.astro\",\"src/pages/admin/posts/[id].astro\"],\"verifyCommand\":\"npm run dev\",\"acceptanceCriteria\":[\"TipTap editor renders with toolbar\",\"Title auto-generates slug\",\"Save via fetch redirects to /admin\",\"Edit page pre-fills from JSON data tag\",\"Published toggle works\"]}\n```"
+    },
+    {
+      "id": 16,
+      "subject": "Task 8: Tools and passkeys admin pages",
+      "status": "pending",
+      "blockedBy": [14],
+      "description": "**Goal:** Build `/admin/tools.astro` (tool CRUD with edit forms inline) and `/admin/passkeys.astro` (list passkeys, delete, add new).\n\n**Files:**\n- Create: `src/pages/admin/tools.astro`\n- Create: `src/pages/admin/passkeys.astro`\n\n**Acceptance Criteria:**\n- [ ] Tools page lists all tools with edit form togglable per row\n- [ ] Edits submit via fetch PUT to `/api/tools/[id]`\n- [ ] Delete calls `DELETE /api/tools/[id]` and removes row from DOM\n- [ ] Display order ↑/↓ buttons work\n- [ ] Add tool form submits via fetch POST to `/api/tools`\n- [ ] Passkeys page lists registered credentials with name and date\n- [ ] Delete passkey calls `DELETE /api/passkeys/[id]`\n- [ ] \"Add another passkey\" runs WebAuthn registration ceremony\n\n**Verify:** `npm run dev` → add a second tool, confirm it appears on `/tools`; add a second passkey.\n\n```json:metadata\n{\"files\":[\"src/pages/admin/tools.astro\",\"src/pages/admin/passkeys.astro\"],\"verifyCommand\":\"npm run dev\",\"acceptanceCriteria\":[\"Tools CRUD works with fetch PUT/DELETE\",\"Display order reordering works\",\"Add tool form works\",\"Passkeys list with delete\",\"Add another passkey runs WebAuthn ceremony\"]}\n```"
+    },
+    {
+      "id": 17,
+      "subject": "Task 9: Rewrite public blog and tools pages to use SQLite",
+      "status": "pending",
+      "blockedBy": [15, 16],
+      "description": "**Goal:** Replace the static Content Collections-based blog and hardcoded tools page with server-rendered versions that query SQLite. Delete `content.config.ts` and the blog content directory.\n\n**Files:**\n- Modify: `src/pages/blog/index.astro`\n- Modify: `src/pages/blog/[id].astro`\n- Modify: `src/pages/tools.astro`\n- Delete: `src/content.config.ts`\n- Delete: `src/content/blog/.gitkeep` (and directory)\n\n**Acceptance Criteria:**\n- [ ] `/blog` lists published posts ordered by `created_at DESC`\n- [ ] `/blog/[slug]` renders `content_html` for published post; returns 404 for missing/unpublished\n- [ ] `/tools` lists active tools ordered by `display_order ASC`\n- [ ] Content Collections config deleted; `npm run build` succeeds without it\n\n**Verify:** `npm run build` → no errors; `npm run dev` → `/tools` shows Vigilant card from DB (seeded); create a published post in admin, confirm it appears on `/blog`.\n\n```json:metadata\n{\"files\":[\"src/pages/blog/index.astro\",\"src/pages/blog/[id].astro\",\"src/pages/tools.astro\",\"src/content.config.ts\",\"src/content/blog/.gitkeep\"],\"verifyCommand\":\"npm run build\",\"acceptanceCriteria\":[\"/blog lists published posts\",\"/blog/[slug] renders content_html\",\"/tools queries SQLite\",\"content.config.ts deleted\"]}\n```"
+    },
+    {
+      "id": 18,
+      "subject": "Task 10: Docker build, deploy infrastructure, and nginx port update",
+      "status": "pending",
+      "blockedBy": [17],
+      "description": "**Goal:** Replace the static nginx Docker setup with a multi-stage Node.js Docker build. Update `docker-compose.yml` for the Node container with a SQLite data volume. Update `deploy.sh` to push code and rebuild on VPS. Update `thunderborn.conf` in vigilant-vps to proxy to port 3000. Perform first deploy.\n\n**Files:**\n- Create: `Dockerfile` (in Portfolio repo)\n- Modify: `docker-compose.yml` (Portfolio repo)\n- Modify: `deploy.sh` (Portfolio repo)\n- Delete: `nginx.conf` (Portfolio repo — no longer used)\n- Modify: `~/Documents/Personal/vigilant-vps/nginx/thunderborn.conf` — change upstream to port 3000\n\n**Acceptance Criteria:**\n- [ ] `docker build .` succeeds\n- [ ] `docker run` starts app on port 3000\n- [ ] SQLite data volume persists across image rebuilds\n- [ ] `thunderborn.conf` upstream changed from `http://portfolio` to `http://portfolio:3000`\n- [ ] `curl -s -o /dev/null -w \"%{http_code}\" https://thunderborn.dev` → `200`\n\n**Verify:** `curl -s -o /dev/null -w \"%{http_code}\" https://thunderborn.dev` → `200`\n\n```json:metadata\n{\"files\":[\"Dockerfile\",\"docker-compose.yml\",\"deploy.sh\",\"nginx.conf\",\"../vigilant-vps/nginx/thunderborn.conf\"],\"verifyCommand\":\"curl -s -o /dev/null -w \\\"%{http_code}\\\" https://thunderborn.dev\",\"acceptanceCriteria\":[\"docker build succeeds\",\"App runs on port 3000\",\"SQLite volume persists\",\"thunderborn.conf upstream is port 3000\",\"https://thunderborn.dev returns 200\"]}\n```"
+    }
+  ],
+  "lastUpdated": "2026-04-26T00:00:00Z"
+}
