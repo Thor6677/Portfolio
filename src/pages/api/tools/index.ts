@@ -12,7 +12,10 @@ export const POST: APIRoute = async ({ request }) => {
   const display_order = tools.length > 0 ? Math.max(...tools.map(t => t.display_order)) + 1 : 0;
 
   if (!name || !url) {
-    return new Response(JSON.stringify({ error: 'Name and URL are required' }), { status: 400 });
+    return new Response(JSON.stringify({ error: 'Name and URL are required' }), {
+      status: 400,
+      headers: { 'Content-Type': 'application/json' },
+    });
   }
 
   createTool({ name, url, description, tags, display_order });

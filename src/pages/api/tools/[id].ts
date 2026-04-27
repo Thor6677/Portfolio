@@ -4,7 +4,10 @@ import { getToolById, updateTool, deleteTool } from '../../../lib/db';
 export const PUT: APIRoute = async ({ params, request }) => {
   const id = parseInt(params.id ?? '');
   if (!id || !getToolById(id)) {
-    return new Response(JSON.stringify({ error: 'Not found' }), { status: 404 });
+    return new Response(JSON.stringify({ error: 'Not found' }), {
+      status: 404,
+      headers: { 'Content-Type': 'application/json' },
+    });
   }
 
   const form = await request.formData();
@@ -17,7 +20,10 @@ export const PUT: APIRoute = async ({ params, request }) => {
   const active = form.get('active') === '1' ? 1 : 0;
 
   if (!name || !url) {
-    return new Response(JSON.stringify({ error: 'Name and URL are required' }), { status: 400 });
+    return new Response(JSON.stringify({ error: 'Name and URL are required' }), {
+      status: 400,
+      headers: { 'Content-Type': 'application/json' },
+    });
   }
 
   updateTool(id, { name, url, description, tags, display_order, active });
@@ -26,7 +32,10 @@ export const PUT: APIRoute = async ({ params, request }) => {
 
 export const DELETE: APIRoute = async ({ params }) => {
   const id = parseInt(params.id ?? '');
-  if (!id) return new Response(JSON.stringify({ error: 'Invalid id' }), { status: 400 });
+  if (!id) return new Response(JSON.stringify({ error: 'Invalid id' }), {
+    status: 400,
+    headers: { 'Content-Type': 'application/json' },
+  });
   deleteTool(id);
   return new Response(JSON.stringify({ ok: true }), { headers: { 'Content-Type': 'application/json' } });
 };

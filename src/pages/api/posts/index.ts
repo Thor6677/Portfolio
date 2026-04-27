@@ -10,10 +10,16 @@ export const POST: APIRoute = async ({ request }) => {
   const published = form.get('published') === '1' ? 1 : 0;
 
   if (!title || !slug) {
-    return new Response(JSON.stringify({ error: 'Title and slug are required' }), { status: 400 });
+    return new Response(JSON.stringify({ error: 'Title and slug are required' }), {
+      status: 400,
+      headers: { 'Content-Type': 'application/json' },
+    });
   }
   if (getPostBySlug(slug)) {
-    return new Response(JSON.stringify({ error: 'Slug already in use' }), { status: 409 });
+    return new Response(JSON.stringify({ error: 'Slug already in use' }), {
+      status: 409,
+      headers: { 'Content-Type': 'application/json' },
+    });
   }
 
   createPost({ title, slug, content_html, summary, published });
