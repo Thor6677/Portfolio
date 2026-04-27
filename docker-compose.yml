@@ -1,34 +1,24 @@
 services:
   portfolio:
-    image: nginx:alpine
+    build: .
     container_name: portfolio
     restart: unless-stopped
+    environment:
+      - HOST=0.0.0.0
+      - PORT=3000
+      - RP_ID=thunderborn.dev
+      - ORIGIN=https://thunderborn.dev
     volumes:
-      - ./www:/usr/share/nginx/html:ro
-      - ./nginx.conf:/etc/nginx/conf.d/default.conf:ro
+      - portfolio_data:/app/data
     networks:
       - web
     security_opt:
       - no-new-privileges:true
-    cap_drop:
-      - ALL
-    cap_add:
-      - NET_BIND_SERVICE
-      - CHOWN
-      - DAC_OVERRIDE
-      - SETGID
-      - SETUID
-    read_only: true
-    tmpfs:
-      - /tmp
-      - /var/cache/nginx
-      - /run
     deploy:
       resources:
         limits:
-          memory: 64M
-          cpus: "0.10"
-          pids: 50
+          memory: 256M
+          cpus: "0.50"
     logging:
       driver: json-file
       options:
@@ -39,3 +29,6 @@ networks:
   web:
     external: true
     name: web
+
+volumes:
+  portfolio_data:
