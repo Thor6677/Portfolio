@@ -1,0 +1,15 @@
+---
+import Base from '../layouts/Base.astro';
+---
+<Base title="Not Found">
+  <h1>404</h1>
+  <p class="msg">Page not found.</p>
+  <a href="/" class="home-link">← Back home</a>
+</Base>
+
+<style>
+  h1 { font-size: 2rem; font-weight: 700; margin: 0 0 0.5rem; color: var(--text-muted); }
+  .msg { color: var(--text-secondary); font-size: 0.9rem; margin: 0 0 1.5rem; }
+  .home-link { font-size: 0.85rem; color: var(--text-muted); }
+  .home-link:hover { color: var(--text-secondary); }
+</style>

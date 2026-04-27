@@ -2,11 +2,11 @@
 import Base from '../../layouts/Base.astro';
 import { getPostBySlug } from '../../lib/db';
 
-const { id } = Astro.params;
-const post = getPostBySlug(id!);
+const { slug } = Astro.params;
+const post = getPostBySlug(slug!);
 
 if (!post || post.published !== 1) {
-  return Astro.redirect('/404', 404);
+  return new Response(null, { status: 404 });
 }
 
 const dateStr = new Date(post.created_at * 1000).toLocaleDateString('en-US', {

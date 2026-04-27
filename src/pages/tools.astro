@@ -14,7 +14,7 @@ const tools = listTools(true);
     <div class="tool-list">
       {tools.map(tool => {
         let tags: string[] = [];
-        try { tags = JSON.parse(tool.tags); } catch {}
+        try { const p = JSON.parse(tool.tags); if (Array.isArray(p)) tags = p; } catch {}
         return (
           <div class="tool-card">
             <div class="tool-header">
