@@ -1,0 +1,70 @@
+---
+import '../../styles/global.css';
+---
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Sign in — thunderborn.dev</title>
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+  </head>
+  <body>
+    <main class="login-wrap">
+      <p class="site-label">thunderborn.dev</p>
+      <h1>Admin</h1>
+      <p class="hint">Use your registered passkey to sign in.</p>
+      <button id="signin-btn" class="btn-primary">Sign in with passkey</button>
+      <p id="error-msg" class="error-msg" hidden></p>
+    </main>
+  </body>
+</html>
+
+<style>
+  body { display: flex; align-items: center; justify-content: center; min-height: 100vh; }
+  .login-wrap { text-align: center; max-width: 320px; }
+  .site-label { color: var(--text-muted); font-size: 0.8rem; margin: 0 0 0.5rem; }
+  h1 { font-size: 1.25rem; font-weight: 600; margin: 0 0 0.5rem; }
+  .hint { color: var(--text-muted); font-size: 0.8rem; margin: 0 0 1.5rem; }
+  .btn-primary {
+    background: var(--text); color: var(--bg); border: none; border-radius: 4px;
+    padding: 0.6rem 1.5rem; font-size: 0.875rem; font-weight: 600; cursor: pointer;
+    transition: opacity 0.15s; width: 100%;
+  }
+  .btn-primary:hover { opacity: 0.85; }
+  .btn-primary:disabled { opacity: 0.5; cursor: default; }
+  .error-msg { color: #f87171; font-size: 0.8rem; margin-top: 1rem; }
+</style>
+
+<script>
+  import { startAuthentication } from '@simplewebauthn/browser';
+
+  const btn = document.getElementById('signin-btn') as HTMLButtonElement;
+  const errEl = document.getElementById('error-msg') as HTMLElement;
+
+  btn.addEventListener('click', async () => {
+    btn.disabled = true;
+    errEl.hidden = true;
+    try {
+      const res = await fetch('/api/auth/login-challenge');
+      const { challengeToken, options } = await res.json();
+      const authResponse = await startAuthentication({ optionsJSON: options });
+      const verify = await fetch('/api/auth/verify-login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ challengeToken, response: authResponse }),
+      });
+      if (verify.ok) {
+        window.location.href = '/admin';
+      } else {
+        const { error } = await verify.json();
+        throw new Error(error ?? 'Sign-in failed');
+      }
+    } catch (err: unknown) {
+      errEl.textContent = err instanceof Error ? err.message : 'Sign-in failed';
+      errEl.hidden = false;
+    } finally {
+      btn.disabled = false;
+    }
+  });
+</script>

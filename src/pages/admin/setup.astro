@@ -1,0 +1,91 @@
+---
+import { isSetupTokenValid } from '../../lib/db';
+
+const token = Astro.url.searchParams.get('token') ?? '';
+const valid = isSetupTokenValid(token);
+---
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Setup — thunderborn.dev</title>
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <style>
+      :root { --bg:#0f0f0f;--surface:#1a1a1a;--border:#262626;--text:#fafafa;--text-secondary:#a3a3a3;--text-muted:#525252; }
+      *,*::before,*::after{box-sizing:border-box}
+      body{background:var(--bg);color:var(--text);font-family:system-ui,sans-serif;margin:0;display:flex;align-items:center;justify-content:center;min-height:100vh;}
+      .wrap{text-align:center;max-width:360px;padding:1rem;}
+      h1{font-size:1.25rem;font-weight:600;margin:0 0 0.5rem;}
+      p{color:var(--text-muted);font-size:0.85rem;margin:0 0 1rem;}
+      input{width:100%;background:var(--surface);border:1px solid var(--border);border-radius:4px;padding:0.5rem 0.75rem;color:var(--text);font-size:0.875rem;margin-bottom:0.75rem;}
+      .btn{background:var(--text);color:var(--bg);border:none;border-radius:4px;padding:0.6rem 1.5rem;font-size:0.875rem;font-weight:600;cursor:pointer;width:100%;transition:opacity 0.15s;}
+      .btn:disabled{opacity:0.5;}
+      .error{color:#f87171;font-size:0.8rem;margin-top:0.75rem;}
+    </style>
+  </head>
+  <body>
+    <div class="wrap">
+      {valid ? (
+        <>
+          <h1>Register your passkey</h1>
+          <p>Give this passkey a name, then follow your device prompt.</p>
+          <input type="text" id="passkey-name" placeholder="e.g. MacBook Touch ID" value="My Passkey" />
+          <button id="register-btn" class="btn">Register passkey</button>
+          <p id="error-msg" class="error" hidden></p>
+        </>
+      ) : (
+        <>
+          <h1>Setup complete</h1>
+          <p>A passkey is already registered. <a href="/admin/login" style="color:inherit;text-decoration:underline">Sign in</a>.</p>
+        </>
+      )}
+    </div>
+
+  </body>
+</html>
+
+<script>
+  import { startRegistration } from '@simplewebauthn/browser';
+
+  const btn = document.getElementById('register-btn') as HTMLButtonElement | null;
+  if (!btn) { /* not valid — do nothing */ }
+  else {
+    const nameInput = document.getElementById('passkey-name') as HTMLInputElement;
+    const errEl = document.getElementById('error-msg') as HTMLElement;
+    const params = new URLSearchParams(window.location.search);
+    const setupToken = params.get('token') ?? '';
+
+    btn.addEventListener('click', async () => {
+      btn.disabled = true;
+      errEl.hidden = true;
+      try {
+        const res = await fetch(`/api/auth/register-challenge?token=${setupToken}`);
+        if (!res.ok) throw new Error('Invalid setup token');
+        const { challengeToken, options } = await res.json();
+        const regResponse = await startRegistration({ optionsJSON: options });
+        const verify = await fetch('/api/auth/verify-registration', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            challengeToken,
+            setupToken,
+            name: nameInput.value || 'Passkey',
+            response: regResponse,
+          }),
+        });
+        if (verify.ok) {
+          window.location.href = '/admin';
+        } else {
+          const { error } = await verify.json();
+          throw new Error(error ?? 'Registration failed');
+        }
+      } catch (err: unknown) {
+        errEl.textContent = err instanceof Error ? err.message : 'Registration failed';
+        errEl.hidden = false;
+      } finally {
+        btn.disabled = false;
+      }
+    });
+  }
+</script>
