@@ -7,18 +7,24 @@ services:
       - HOST=0.0.0.0
       - PORT=3000
       - RP_ID=thunderborn.dev
+      - RP_NAME=thunderborn.dev
       - ORIGIN=https://thunderborn.dev
+      - DB_PATH=/app/data/db.sqlite
     volumes:
       - portfolio_data:/app/data
     networks:
       - web
     security_opt:
       - no-new-privileges:true
+    read_only: true
+    tmpfs:
+      - /tmp
     deploy:
       resources:
         limits:
           memory: 256M
           cpus: "0.50"
+          pids: 100
     logging:
       driver: json-file
       options:
