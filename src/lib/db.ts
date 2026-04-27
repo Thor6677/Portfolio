@@ -12,6 +12,7 @@ export function getDb(): Database.Database {
   mkdirSync(dirname(DB_PATH), { recursive: true });
   _db = new Database(DB_PATH);
   _db.pragma('journal_mode = WAL');
+  _db.pragma('busy_timeout = 5000');
   _db.pragma('foreign_keys = ON');
   initSchema(_db);
   seedIfEmpty(_db);
@@ -158,18 +159,24 @@ export function getToolById(id: number): Tool | undefined {
 export function createTool(data: {
   name: string; url: string; description: string; tags: string; display_order: number;
 }): void {
+  let tagsJson: string;
+  try { tagsJson = JSON.stringify(JSON.parse(data.tags)); }
+  catch { throw new Error('tags must be a valid JSON array string'); }
   getDb().prepare(`
     INSERT INTO tools (name, url, description, tags, display_order, active)
     VALUES (?, ?, ?, ?, ?, 1)
-  `).run(data.name, data.url, data.description, data.tags, data.display_order);
+  `).run(data.name, data.url, data.description, tagsJson, data.display_order);
 }
 
 export function updateTool(id: number, data: {
   name: string; url: string; description: string; tags: string; display_order: number; active: number;
 }): void {
+  let tagsJson: string;
+  try { tagsJson = JSON.stringify(JSON.parse(data.tags)); }
+  catch { throw new Error('tags must be a valid JSON array string'); }
   getDb().prepare(`
     UPDATE tools SET name=?, url=?, description=?, tags=?, display_order=?, active=? WHERE id=?
-  `).run(data.name, data.url, data.description, data.tags, data.display_order, data.active, id);
+  `).run(data.name, data.url, data.description, tagsJson, data.display_order, data.active, id);
 }
 
 export function deleteTool(id: number): void {
@@ -222,9 +229,12 @@ export function countPasskeys(): number {
 // ── Sessions ──────────────────────────────────────────────────────────────────
 
 export function createSession(): string {
+  const db = getDb();
+  const now = Math.floor(Date.now() / 1000);
+  db.prepare('DELETE FROM sessions WHERE expires_at < ?').run(now);
   const id = randomBytes(32).toString('hex');
-  const expiresAt = Math.floor(Date.now() / 1000) + 7 * 24 * 60 * 60;
-  getDb().prepare('INSERT INTO sessions (id, expires_at) VALUES (?, ?)').run(id, expiresAt);
+  const expiresAt = now + 7 * 24 * 60 * 60;
+  db.prepare('INSERT INTO sessions (id, expires_at) VALUES (?, ?)').run(id, expiresAt);
   return id;
 }
 
