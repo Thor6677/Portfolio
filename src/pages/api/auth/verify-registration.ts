@@ -16,16 +16,17 @@ export const POST: APIRoute = async ({ request, cookies }) => {
     return new Response(JSON.stringify({ error: 'Invalid JSON' }), { status: 400 });
   }
 
+  // Consume challenge first — once presented, it must not be reusable regardless of auth outcome
+  const challenge = consumeChallenge(body.challengeToken);
+  if (!challenge) {
+    return new Response(JSON.stringify({ error: 'Challenge expired or invalid' }), { status: 400 });
+  }
+
   const sessionId = cookies.get('session')?.value;
   const isAdmin = sessionId ? validateSession(sessionId) : false;
   const isSetup = body.setupToken ? isSetupTokenValid(body.setupToken) : false;
   if (!isAdmin && !isSetup) {
     return new Response(JSON.stringify({ error: 'Forbidden' }), { status: 403 });
-  }
-
-  const challenge = consumeChallenge(body.challengeToken);
-  if (!challenge) {
-    return new Response(JSON.stringify({ error: 'Challenge expired or invalid' }), { status: 400 });
   }
 
   const regResponse = body.response as Parameters<typeof verifyRegistrationResponse>[0]['response'];
@@ -55,8 +56,8 @@ export const POST: APIRoute = async ({ request, cookies }) => {
 
   if (body.setupToken) {
     consumeSetupToken(body.setupToken);
-    const sessionId = createSession();
-    cookies.set('session', sessionId, {
+    const newSessionId = createSession();
+    cookies.set('session', newSessionId, {
       httpOnly: true, secure: true, sameSite: 'strict', path: '/', maxAge: 7 * 24 * 60 * 60,
     });
   }
