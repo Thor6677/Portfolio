@@ -3,7 +3,7 @@ import AdminBase from '../../../layouts/AdminBase.astro';
 ---
 <AdminBase title="New Post">
   <h1 class="page-title">New Post</h1>
-  <form id="post-form" method="POST" action="/api/posts" class="post-form">
+  <form id="post-form" class="post-form">
     <div class="field">
       <label for="title">Title</label>
       <input type="text" id="title" name="title" required autocomplete="off" />
@@ -94,15 +94,26 @@ import AdminBase from '../../../layouts/AdminBase.astro';
   import StarterKit from '@tiptap/starter-kit';
   import Link from '@tiptap/extension-link';
 
+  function updateToolbar(editor: Editor) {
+    const map: Record<string, boolean> = {
+      bold: editor.isActive('bold'), italic: editor.isActive('italic'),
+      h2: editor.isActive('heading', { level: 2 }), h3: editor.isActive('heading', { level: 3 }),
+      code: editor.isActive('code'), codeBlock: editor.isActive('codeBlock'),
+      link: editor.isActive('link'), bulletList: editor.isActive('bulletList'),
+      orderedList: editor.isActive('orderedList'),
+    };
+    document.querySelectorAll<HTMLElement>('[data-action]').forEach(btn =>
+      btn.classList.toggle('is-active', map[btn.dataset.action!] ?? false));
+  }
+
   const editor = new Editor({
     element: document.getElementById('editor-mount')!,
-    extensions: [
-      StarterKit,
-      Link.configure({ openOnClick: false }),
-    ],
+    extensions: [StarterKit, Link.configure({ openOnClick: false })],
     onUpdate({ editor }) {
       (document.getElementById('content-hidden') as HTMLInputElement).value = editor.getHTML();
+      updateToolbar(editor);
     },
+    onSelectionUpdate({ editor }) { updateToolbar(editor); },
   });
 
   // Toolbar
@@ -139,8 +150,12 @@ import AdminBase from '../../../layouts/AdminBase.astro';
     document.getElementById('slug-display')!.textContent = (e.target as HTMLInputElement).value || '—';
   });
 
-  // Sync content_html before submit
-  document.getElementById('post-form')!.addEventListener('submit', () => {
-    (document.getElementById('content-hidden') as HTMLInputElement).value = editor.getHTML();
+  document.getElementById('post-form')!.addEventListener('submit', async e => {
+    e.preventDefault();
+    const formData = new FormData(e.currentTarget as HTMLFormElement);
+    formData.set('content_html', editor.getHTML());
+    const res = await fetch('/api/posts', { method: 'POST', body: formData });
+    if (res.ok) { window.location.href = '/admin'; }
+    else { const { error } = await res.json(); alert(error ?? 'Save failed'); }
   });
 </script>

@@ -2,7 +2,8 @@
 import AdminBase from '../../../layouts/AdminBase.astro';
 import { getPostById } from '../../../lib/db';
 
-const id = parseInt(Astro.params.id ?? '');
+const raw = Astro.params.id ?? '';
+const id = /^\d+$/.test(raw) ? Number(raw) : NaN;
 const post = id ? getPostById(id) : undefined;
 if (!post) return Astro.redirect('/admin');
 ---
@@ -102,13 +103,27 @@ if (!post) return Astro.redirect('/admin');
     (document.getElementById('post-data') as HTMLScriptElement).textContent ?? '{}'
   );
 
+  function updateToolbar(editor: Editor) {
+    const map: Record<string, boolean> = {
+      bold: editor.isActive('bold'), italic: editor.isActive('italic'),
+      h2: editor.isActive('heading', { level: 2 }), h3: editor.isActive('heading', { level: 3 }),
+      code: editor.isActive('code'), codeBlock: editor.isActive('codeBlock'),
+      link: editor.isActive('link'), bulletList: editor.isActive('bulletList'),
+      orderedList: editor.isActive('orderedList'),
+    };
+    document.querySelectorAll<HTMLElement>('[data-action]').forEach(btn =>
+      btn.classList.toggle('is-active', map[btn.dataset.action!] ?? false));
+  }
+
   const editor = new Editor({
     element: document.getElementById('editor-mount')!,
     extensions: [StarterKit, Link.configure({ openOnClick: false })],
     content: initialContent,
     onUpdate({ editor }) {
       (document.getElementById('content-hidden') as HTMLInputElement).value = editor.getHTML();
+      updateToolbar(editor);
     },
+    onSelectionUpdate({ editor }) { updateToolbar(editor); },
   });
 
   document.querySelector('.editor-toolbar')!.addEventListener('click', e => {
