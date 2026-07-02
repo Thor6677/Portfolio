@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-VPS="ijohnson@146.190.140.112"
+VPS="thunderborn-home"
 VPS_DIR="/opt/portfolio"
 NGINX_CONF_SRC="deploy/thunderborn.conf"
 NGINX_CONF_DEST="/opt/edge/nginx/conf.d/thunderborn.conf"

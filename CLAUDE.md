@@ -3,8 +3,8 @@
 Personal portfolio site at thunderborn.dev. Astro 6 SSR app with a passkey-authenticated admin panel for managing blog posts and tools. Content lives in SQLite — no redeploy needed for content changes.
 
 ## Access
-- **VPS**: `ssh ijohnson@146.190.140.112`
-- **Code on VPS**: `/opt/portfolio/`
+- **Host**: `ssh thunderborn-home` (Hyper-V VM, LAN `192.168.50.245` / Tailscale `100.69.220.34`)
+- **Code on host**: `/opt/portfolio/`
 - **GitHub**: `Thor6677/Portfolio`
 - **Live URL**: `https://thunderborn.dev`
 - **Admin panel**: `https://thunderborn.dev/admin`
@@ -37,13 +37,13 @@ git push origin main
 ## First-Time Passkey Setup
 If no passkeys are registered, the setup token is logged on startup:
 ```
-ssh ijohnson@146.190.140.112 "docker logs portfolio | grep 'Setup token'"
+ssh thunderborn-home "docker logs portfolio | grep 'Setup token'"
 ```
 Visit the logged URL to register the first passkey via Touch ID / Face ID.
 
 ## Debugging
 ```
-ssh ijohnson@146.190.140.112 "docker logs portfolio --tail=50"
+ssh thunderborn-home "docker logs portfolio --tail=50"
 ```
 
 ## Architecture
