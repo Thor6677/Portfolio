@@ -29,33 +29,33 @@ const posts = listPosts(true);
 </Base>
 
 <style>
-  h1 { font-size: 1.25rem; font-weight: 600; margin: 0 0 0.25rem; }
-  .subtitle { color: var(--text-muted); font-size: 0.85rem; margin: 0 0 1.5rem; }
+  h1 { font-family: var(--font-serif); font-size: var(--text-h2); font-weight: 500; margin: 0 0 var(--space-1); color: var(--text-primary); }
+  .subtitle { color: var(--text-muted); font-size: var(--text-sm); font-family: var(--font-mono); margin: 0 0 var(--space-8); }
 
   .empty {
-    background: var(--surface);
-    border: 1px dashed var(--border);
-    border-radius: 6px;
-    padding: 2rem;
+    background: var(--surface-1);
+    border: 1px dashed var(--border-subtle);
+    border-radius: var(--radius-lg);
+    padding: var(--space-8);
     text-align: center;
     color: var(--text-muted);
-    font-size: 0.875rem;
+    font-size: var(--text-sm);
   }
 
   .post-list { list-style: none; padding: 0; margin: 0; }
-  .post-list li { border-bottom: 1px solid var(--border); }
+  .post-list li { border-bottom: 1px solid var(--border-subtle); }
   .post-list li:last-child { border-bottom: none; }
 
   .post-link {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 0.75rem 0;
-    font-size: 0.875rem;
+    padding: var(--space-4) 0;
+    font-size: var(--text-sm);
     color: var(--text-secondary);
-    transition: color 0.15s;
+    transition: color var(--dur-fast) var(--ease-soft);
   }
 
-  .post-link:hover .post-title { color: var(--text); }
-  .post-date { color: var(--text-muted); font-size: 0.75rem; flex-shrink: 0; }
+  .post-link:hover .post-title { color: var(--text-primary); }
+  .post-date { color: var(--text-muted); font-family: var(--font-mono); font-size: var(--text-xs); flex-shrink: 0; }
 </style>

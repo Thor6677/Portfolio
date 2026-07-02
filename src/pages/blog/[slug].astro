@@ -34,24 +34,35 @@ const safeHtml = sanitizeHtml(post.content_html, {
 </Base>
 
 <style>
-  h1 { font-size: 1.25rem; font-weight: 600; margin: 0 0 0.25rem; }
-  .date { color: var(--text-muted); font-size: 0.8rem; display: block; margin-bottom: 2rem; }
+  h1 { font-family: var(--font-serif); font-size: var(--text-h1); font-weight: 500; margin: 0 0 var(--space-2); color: var(--text-primary); line-height: var(--leading-tight); letter-spacing: var(--tracking-tight); }
+  .date { color: var(--text-muted); font-family: var(--font-mono); font-size: var(--text-xs); display: block; margin-bottom: var(--space-8); }
 
-  .content { font-size: 0.875rem; line-height: 1.8; color: var(--text-secondary); }
-  .content h2 { font-size: 1rem; font-weight: 600; color: var(--text); margin-top: 2rem; }
-  .content a { color: var(--text-secondary); text-decoration: underline; }
+  .content { font-size: var(--text-base); line-height: var(--leading-relaxed); color: var(--text-secondary); max-width: var(--measure); }
+  .content h2 { font-family: var(--font-serif); font-size: var(--text-h3); font-weight: 500; color: var(--text-primary); margin-top: var(--space-8); line-height: var(--leading-tight); }
+  .content a { color: var(--text-secondary); text-decoration: underline; text-decoration-color: var(--border-strong); transition: color var(--dur-fast) var(--ease-soft); }
+  .content a:hover { color: var(--text-primary); }
   .content code {
-    background: var(--surface);
-    padding: 0.1rem 0.3rem;
-    border-radius: 3px;
-    font-size: 0.8em;
+    background: var(--surface-1);
+    padding: 0.15rem 0.4rem;
+    border-radius: var(--radius-sm);
+    font-family: var(--font-mono);
+    font-size: 0.85em;
+    color: var(--clay-300);
   }
   .content pre {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: 6px;
-    padding: 1rem;
+    background: var(--bg-well);
+    border: 1px solid var(--border-subtle);
+    border-radius: var(--radius-lg);
+    padding: var(--space-6);
     overflow-x: auto;
+    box-shadow: var(--shadow-md);
   }
-  .content pre code { background: none; padding: 0; }
+  .content pre code { background: none; padding: 0; color: var(--text-secondary); }
+  .content blockquote {
+    border-left: 3px solid var(--clay-500);
+    margin: 0;
+    padding: var(--space-3) var(--space-6);
+    color: var(--text-muted);
+    font-style: italic;
+  }
 </style>

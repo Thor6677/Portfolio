@@ -1,0 +1,14 @@
+/* ============================================================
+   Motion — thunderborn.dev
+   ============================================================ */
+
+:root {
+  --dur-fast:   120ms;
+  --dur-base:   200ms;
+  --dur-slow:   360ms;
+
+  --ease-standard: cubic-bezier(0.2, 0, 0, 1);
+  --ease-soft:     cubic-bezier(0.4, 0, 0.2, 1);
+
+  --lift-hover: -2px;
+}

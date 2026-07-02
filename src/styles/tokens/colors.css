@@ -1,0 +1,71 @@
+/* ============================================================
+   Colors — thunderborn.dev
+   Warm dark. Not pure black — soft warm charcoal ground,
+   off-white ink, a single muted clay-orange accent used sparingly.
+   ============================================================ */
+
+:root {
+  /* --- Warm neutral scale (the charcoal ground) --- */
+  --ink-990: #1C1B19; /* deepest — footer wells, code blocks */
+  --ink-950: #201F1D;
+  --ink-900: #262624; /* PAGE BACKGROUND */
+  --ink-850: #2C2B28; /* raised surface / card */
+  --ink-800: #323029; /* higher surface / hover */
+  --ink-750: #38362F;
+  --ink-700: #423F38; /* hairline / subtle border */
+  --ink-600: #55524A; /* stronger border, disabled ink */
+
+  /* --- Warm off-white ink scale --- */
+  --paper-50:  #F5F4EF; /* PRIMARY TEXT */
+  --paper-100: #ECEAE2;
+  --paper-200: #D9D6CE; /* secondary text */
+  --paper-300: #BEBAB0;
+  --paper-400: #A29E93; /* muted / captions */
+  --paper-500: #857F73; /* faint / disabled */
+
+  /* --- Clay-orange accent (the single accent) --- */
+  --clay-300: #E9A489;
+  --clay-400: #E28B6C;
+  --clay-500: #D97757; /* ACCENT */
+  --clay-600: #C55F3D;
+  --clay-700: #A24B30;
+  --clay-tint: rgba(217, 119, 87, 0.12); /* accent wash on surfaces */
+
+  /* --- Semantic status (all muted, warm-leaning) --- */
+  --sage-500:   #7E9E6B; /* success / online */
+  --amber-500:  #D9A85C; /* warning */
+  --rust-500:   #CC6B5A; /* danger / error */
+  --slate-500:  #6E93A6; /* info / neutral tech */
+
+  /* ============================================================
+     Semantic aliases — reach for THESE in components
+     ============================================================ */
+  --bg-page:        var(--ink-900);
+  --bg-well:        var(--ink-990);
+  --surface-1:      var(--ink-850);
+  --surface-2:      var(--ink-800);
+  --surface-3:      var(--ink-750);
+
+  --text-primary:   var(--paper-50);
+  --text-secondary: var(--paper-200);
+  --text-muted:     var(--paper-400);
+  --text-faint:     var(--paper-500);
+  --text-accent:    var(--clay-500);
+  --text-on-accent: #FBF6F2;
+
+  --border-subtle:  var(--ink-700);
+  --border-strong:  var(--ink-600);
+  --border-accent:  var(--clay-500);
+
+  --accent:         var(--clay-500);
+  --accent-hover:   var(--clay-400);
+  --accent-press:   var(--clay-600);
+  --accent-wash:    var(--clay-tint);
+
+  --focus-ring:     rgba(217, 119, 87, 0.55);
+
+  --success:        var(--sage-500);
+  --warning:        var(--amber-500);
+  --danger:         var(--rust-500);
+  --info:           var(--slate-500);
+}

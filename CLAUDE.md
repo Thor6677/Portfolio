@@ -9,12 +9,22 @@ Personal portfolio site at thunderborn.dev. Astro 6 SSR app with a passkey-authe
 - **Live URL**: `https://thunderborn.dev`
 - **Admin panel**: `https://thunderborn.dev/admin`
 
+## Related repos on this VPS
+
+The VPS hosts several apps and a separate ops layer. If you're touching anything VPS-wide (monitoring, alerts, package updates, system metrics, nginx, TLS), the change probably belongs in one of these, not here:
+
+- **`Thor6677/thunderborn-ops`** (`/opt/thunderborn-ops/` on VPS) — host-wide ops: monitoring (every-5-min Discord alerts on container/HTTP/TLS state changes), weekly auto-update + reboot orchestration, OOM watcher, daily Discord status digest, UptimeRobot setup, the maintenance flag that silences alerts during deploys. Portfolio's `deploy.sh` should call `/opt/thunderborn-ops/scripts/maintenance.sh on/off` to bracket the rebuild — same pattern vigilant uses.
+- **`/opt/edge/`** (local-only git, on VPS) — shared reverse proxy / TLS termination. The container is `edge-nginx-1`. Adding a domain, editing a vhost, or changing TLS settings happens there.
+- **`Thor6677/Vigilant`** — EVE Online companion at `vigilant.thunderborn.dev`. Independent app on the same VPS.
+
+When you add probes, change alert thresholds, rotate API keys in `/etc/host-ops/host-ops.env`, edit cron timing, or touch anything under `/opt/thunderborn-ops/`, that's the ops repo — clone it from GitHub if you don't have it locally yet.
+
 ## Deploy
 Run from repo root — pushes to GitHub, rebuilds the Docker image on VPS, syncs the nginx vhost if changed:
 ```
 ./deploy.sh
 ```
-The nginx container belongs to the Vigilant stack (`/opt/vigilant/`) but `deploy.sh` handles recreating it when `deploy/thunderborn.conf` changes.
+The nginx container is `edge-nginx-1`, owned by the shared `/opt/edge/` stack (local-only git on the VPS) since the 2026-05-14 split. Vhosts live in `/opt/edge/nginx/conf.d/`. `deploy.sh` syncs `deploy/thunderborn.conf` to `/opt/edge/nginx/conf.d/thunderborn.conf` and force-recreates `edge-nginx-1` from `/opt/edge/docker-compose.yml` when the vhost changes.
 
 ### Rollback
 No rollback script. Use `git revert` for bad code:
@@ -92,7 +102,7 @@ RUN apk add --no-cache python3 make g++
 The `.dockerignore` excludes `data/` so the local dev SQLite database is never baked into the image.
 
 ### nginx vhost
-`deploy/thunderborn.conf` is the nginx config for proxying thunderborn.dev to this container. It lives in this repo (not vigilant-vps). `deploy.sh` syncs it to `/opt/vigilant/nginx/thunderborn.conf` and force-recreates the nginx container when it changes (`nginx -s reload` reads old inodes on bind-mounts; container recreate is required).
+`deploy/thunderborn.conf` is the nginx config for proxying thunderborn.dev to this container. It lives in this repo (not in the edge repo) because vhost changes ride along with the app that owns them. `deploy.sh` syncs it to `/opt/edge/nginx/conf.d/thunderborn.conf` and force-recreates the edge nginx container when it changes — `nginx -s reload` reads old inodes on bind-mounts so a recreate is required, not a reload.
 
 ## Workflow
 Commit and push at the end of every session. Before finishing, ask: "Should I commit and push these changes?"

@@ -4,7 +4,7 @@ set -euo pipefail
 VPS="ijohnson@146.190.140.112"
 VPS_DIR="/opt/portfolio"
 NGINX_CONF_SRC="deploy/thunderborn.conf"
-NGINX_CONF_DEST="/opt/vigilant/nginx/thunderborn.conf"
+NGINX_CONF_DEST="/opt/edge/nginx/conf.d/thunderborn.conf"
 
 echo "==> Pushing to GitHub..."
 git push origin main
@@ -16,7 +16,7 @@ LOCAL_HASH=$(md5 -q "$NGINX_CONF_SRC")
 if [ "$REMOTE_HASH" != "$LOCAL_HASH" ]; then
   echo "  thunderborn.conf changed — updating and recreating nginx"
   scp "$NGINX_CONF_SRC" "$VPS:$NGINX_CONF_DEST"
-  ssh "$VPS" "cd /opt/vigilant && docker compose up -d --force-recreate nginx"
+  ssh "$VPS" "cd /opt/edge && docker compose up -d --force-recreate nginx"
 else
   echo "  thunderborn.conf unchanged — skipping nginx"
 fi
